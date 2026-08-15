@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+{% block description %}Student Profile — View your account and scholarship details.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title"><i class="fas fa-user-circle"></i> Student Profile</h1>
+    <p class="page-subtitle">View your logged-in student account and scholarship information.</p>
+  </div>
+</div>
+
+<div class="container page-container">
+  <div class="card card--form" style="max-width: 720px; margin: 0 auto; padding: 2.25rem;">
+    
+    <div style="display: flex; align-items: center; gap: 1.5rem; border-bottom: 2px solid #EAF6E8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+      <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #075E3D, #1B7F3A); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 4px 12px rgba(7,94,61,0.25);">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div>
+        <h2 style="font-size: 1.35rem; color: #173B2A; margin: 0;">{{ student_name }}</h2>
+        <p style="font-size: 0.85rem; color: #5A7A6A; margin-top: 2px;"><i class="fas fa-envelope"></i> {{ student_email }}</p>
+        <div style="display: inline-block; background: #E8F5E9; color: #1B7F3A; padding: 3px 12px; border-radius: 12px; font-size: 0.76rem; font-weight: 700; margin-top: 6px;">
+          ● Active Student Account
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.74rem; font-weight: 600; color: #5A7A6A; text-transform: uppercase;">Account ID</span>
+        <span style="font-size: 0.95rem; font-weight: 700; color: #173B2A;">GS-STD-2026</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.74rem; font-weight: 600; color: #5A7A6A; text-transform: uppercase;">Role</span>
+        <span style="font-size: 0.95rem; font-weight: 700; color: #173B2A;">Scholarship Applicant</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.74rem; font-weight: 600; color: #5A7A6A; text-transform: uppercase;">Scholarship Portal Status</span>
+        <span style="font-size: 0.95rem; font-weight: 700; color: #1B7F3A;">Eligible / Verified</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.74rem; font-weight: 600; color: #5A7A6A; text-transform: uppercase;">Region / State</span>
+        <span style="font-size: 0.95rem; font-weight: 700; color: #173B2A;">Karnataka, India</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <a href="{{ url_for('apply_page') }}" class="btn btn--hero-primary" style="padding: 0.6rem 1.2rem; font-size: 0.88rem;">
+        <i class="fas fa-file-signature"></i> Apply for Scholarship
+      </a>
+      <a href="{{ url_for('dashboard') }}" class="btn btn--hero-outline" style="padding: 0.6rem 1.2rem; font-size: 0.88rem;">
+        <i class="fas fa-chart-line"></i> View Dashboard
+      </a>
+      <a href="{{ url_for('api_logout') }}" class="btn" style="background: #FFEBEE; color: #D32F2F; padding: 0.6rem 1.2rem; font-size: 0.88rem;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

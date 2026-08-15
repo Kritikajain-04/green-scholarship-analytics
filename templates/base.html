@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Green Scholarship{% endblock %} — Empowering Students, Protecting Nature</title>
+  <meta name="description" content="{% block description %}Green Scholarship Portal — Apply for scholarships, check eligibility, and explore environmental analytics.{% endblock %}" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Core styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+
+  <!-- Page-specific styles -->
+  {% block styles %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     TOP INFO BAR
+═══════════════════════════════════════════════════ -->
+<div class="topbar-info" id="topbar-info">
+  <div class="container topbar-info__inner">
+    <div class="topbar-info__left">
+      <a href="mailto:greenscholarship@gmail.com" class="topbar-info__link">
+        <i class="fas fa-envelope"></i>
+        greenscholarship@gmail.com
+      </a>
+      <a href="tel:+919876543210" class="topbar-info__link">
+        <i class="fas fa-phone"></i>
+        +91 98765 43210
+      </a>
+    </div>
+    <div class="topbar-info__right">
+      <i class="fas fa-user-circle"></i>
+      Welcome, <span id="topbar-student-name">Student</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN NAVIGATION
+═══════════════════════════════════════════════════ -->
+<header class="navbar" id="navbar">
+  <div class="container navbar__inner">
+
+    <!-- Brand -->
+    <a href="/home" class="navbar__brand">
+      <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship" class="navbar__logo" />
+      <div class="navbar__brand-text">
+        <span class="navbar__brand-name">Green Scholarship</span>
+        <span class="navbar__brand-tagline">Empowering Students, Protecting Nature</span>
+      </div>
+    </a>
+
+    <!-- Desktop Nav Links -->
+    <nav class="navbar__links" id="navbar-links" role="navigation" aria-label="Main navigation">
+      <a href="{{ url_for('home') }}"        class="navbar__link {% block nav_home %}{% endblock %}"        id="nav-home">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <a href="{{ url_for('apply_page') }}"       class="navbar__link {% block nav_apply %}{% endblock %}"       id="nav-apply">
+        <i class="fas fa-file-alt"></i> Apply
+      </a>
+      <a href="{{ url_for('dashboard') }}"   class="navbar__link {% block nav_dashboard %}{% endblock %}"   id="nav-dashboard">
+        <i class="fas fa-chart-bar"></i> Dashboard
+      </a>
+      <a href="{{ url_for('eligibility_page') }}" class="navbar__link {% block nav_eligibility %}{% endblock %}" id="nav-eligibility">
+        <i class="fas fa-check-circle"></i> Eligibility
+      </a>
+      <a href="{{ url_for('resources_page') }}"   class="navbar__link {% block nav_resources %}{% endblock %}"   id="nav-resources">
+        <i class="fas fa-book"></i> Resources
+      </a>
+      <a href="{{ url_for('contact_page') }}"     class="navbar__link {% block nav_contact %}{% endblock %}"     id="nav-contact">
+        <i class="fas fa-envelope"></i> Contact
+      </a>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="navbar__controls">
+      <div class="navbar__user" id="navbar-user">
+        <div class="navbar__user-avatar" id="user-avatar-btn" title="Profile">
+          <i class="fas fa-user"></i>
+        </div>
+        <span class="navbar__user-name" id="navbar-user-name">Student</span>
+        <div class="navbar__user-dropdown" id="user-dropdown">
+          <a href="{{ url_for('profile_page') }}" class="dropdown-item"><i class="fas fa-id-card"></i> My Profile</a>
+          <a href="{{ url_for('dashboard') }}" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+          <div class="dropdown-divider"></div>
+          <a href="{{ url_for('api_logout') }}" class="dropdown-item dropdown-item--danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+      <a href="{{ url_for('api_logout') }}" class="btn-logout" id="logout-btn" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+      <!-- Hamburger (mobile) -->
+      <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- Mobile Nav Drawer -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="/home"        class="mobile-nav__link {% block mnav_home %}{% endblock %}">        <i class="fas fa-home"></i>        Home</a>
+  <a href="/apply"       class="mobile-nav__link {% block mnav_apply %}{% endblock %}">       <i class="fas fa-file-alt"></i>    Apply</a>
+  <a href="/dashboard"   class="mobile-nav__link {% block mnav_dashboard %}{% endblock %}">   <i class="fas fa-chart-bar"></i>   Dashboard</a>
+  <a href="/eligibility" class="mobile-nav__link {% block mnav_eligibility %}{% endblock %}"> <i class="fas fa-check-circle"></i> Eligibility</a>
+  <a href="/resources"   class="mobile-nav__link {% block mnav_resources %}{% endblock %}">   <i class="fas fa-book"></i>        Resources</a>
+  <a href="/contact"     class="mobile-nav__link {% block mnav_contact %}{% endblock %}">     <i class="fas fa-envelope"></i>    Contact</a>
+  <div class="mobile-nav__divider"></div>
+  <a href="/api/logout"  class="mobile-nav__link mobile-nav__link--danger">                  <i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN PAGE CONTENT
+═══════════════════════════════════════════════════ -->
+<main id="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+
+      <!-- Brand Column -->
+      <div class="footer__brand">
+        <a href="/home" class="footer__logo-wrap">
+          <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship" class="footer__logo" />
+        </a>
+        <p class="footer__tagline">Empowering Students,<br>Protecting Nature.</p>
+        <div class="footer__social">
+          <a href="#" class="footer__social-link" aria-label="Facebook">  <i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="footer__social-link" aria-label="Twitter/X"> <i class="fab fa-x-twitter"></i></a>
+          <a href="#" class="footer__social-link" aria-label="Instagram"> <i class="fab fa-instagram"></i></a>
+          <a href="#" class="footer__social-link" aria-label="LinkedIn">  <i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer__col">
+        <h4 class="footer__heading">Quick Links</h4>
+        <ul class="footer__list">
+          <li><a href="/home">Home</a></li>
+          <li><a href="/apply">Apply for Scholarship</a></li>
+          <li><a href="/eligibility">Check Eligibility</a></li>
+          <li><a href="/dashboard">Student Dashboard</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div class="footer__col">
+        <h4 class="footer__heading">Resources</h4>
+        <ul class="footer__list">
+          <li><a href="/resources#guidelines">Scholarship Guidelines</a></li>
+          <li><a href="/resources#guidelines">Application Guide</a></li>
+          <li><a href="/resources#faqs">Eligibility Criteria</a></li>
+          <li><a href="/resources#guidelines">Required Documents</a></li>
+          <li><a href="/resources#faqs">FAQs</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div class="footer__col">
+        <h4 class="footer__heading">Company</h4>
+        <ul class="footer__list">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms &amp; Conditions</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Footer Bottom Bar -->
+    <div class="footer__bottom">
+      <p class="footer__copy">
+        <i class="fas fa-leaf"></i>
+        &copy; 2026 Green Scholarship. All rights reserved.
+      </p>
+      <div class="footer__bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- Core app scripts -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

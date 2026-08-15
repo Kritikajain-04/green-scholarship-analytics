@@ -1,0 +1,54 @@
+{
+    "name": "Green Scholarship Theme",
+    "dataColors": [
+        "#1B5E20",
+        "#81C784",
+        "#4CAF50",
+        "#388E3C",
+        "#2E7D32",
+        "#A5D6A7",
+        "#C8E6C9",
+        "#E8F5E9"
+    ],
+    "background": "#FFFFFF",
+    "foreground": "#1B5E20",
+    "tableAccent": "#1B5E20",
+    "visualStyles": {
+        "*": {
+            "*": {
+                "background": [
+                    {
+                        "show": true,
+                        "color": { "solid": { "color": "#FFFFFF" } }
+                    }
+                ],
+                "border": [
+                    {
+                        "show": true,
+                        "color": { "solid": { "color": "#E0E0E0" } },
+                        "radius": 8
+                    }
+                ],
+                "dropShadow": [
+                    {
+                        "show": true,
+                        "color": { "solid": { "color": "#000000", "opacity": 10 } },
+                        "position": "Outer",
+                        "preset": "BottomRight",
+                        "shadowBlur": 10
+                    }
+                ]
+            }
+        },
+        "page": {
+            "*": {
+                "background": [
+                    {
+                        "color": { "solid": { "color": "#F4F7F6" } },
+                        "transparency": 0
+                    }
+                ]
+            }
+        }
+    }
+}

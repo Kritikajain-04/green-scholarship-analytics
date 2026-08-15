@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Scholarship — Empowering Students, Protecting Nature</title>
+  <meta name="description" content="Green Scholarship Portal — Apply for scholarships, check eligibility, and explore environmental analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 1 — SPLASH SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="screen-splash" class="screen active">
+  <!-- Decorative background elements -->
+  <div class="splash-bg">
+    <div class="splash-leaf splash-leaf--1"><i class="fas fa-leaf"></i></div>
+    <div class="splash-leaf splash-leaf--2"><i class="fas fa-leaf"></i></div>
+    <div class="splash-leaf splash-leaf--3"><i class="fas fa-seedling"></i></div>
+    <div class="splash-leaf splash-leaf--4"><i class="fas fa-leaf"></i></div>
+    <div class="splash-leaf splash-leaf--5"><i class="fas fa-tree"></i></div>
+    <div class="splash-circle splash-circle--1"></div>
+    <div class="splash-circle splash-circle--2"></div>
+  </div>
+
+  <div class="splash-content">
+    <div class="splash-logo-wrap">
+      <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship Logo" class="splash-logo" />
+    </div>
+    <div class="splash-progress">
+      <div class="splash-progress-bar" id="splash-progress-bar"></div>
+    </div>
+    <p class="splash-loading-text">Loading your portal…</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 2 — LOGIN PAGE
+═══════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen">
+  <div class="auth-layout">
+
+    <!-- Left decorative panel -->
+    <div class="auth-panel auth-panel--left">
+      <div class="auth-panel-content">
+        <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship" class="panel-logo" />
+        <h2 class="panel-title">Green Scholarship</h2>
+        <p class="panel-tagline">Empowering Students,<br>Protecting Nature.</p>
+        <div class="panel-features">
+          <div class="panel-feature">
+            <span class="feature-icon"><i class="fas fa-leaf"></i></span>
+            <span>Environmental Impact Tracking</span>
+          </div>
+          <div class="panel-feature">
+            <span class="feature-icon"><i class="fas fa-graduation-cap"></i></span>
+            <span>Scholarship Eligibility Check</span>
+          </div>
+          <div class="panel-feature">
+            <span class="feature-icon"><i class="fas fa-chart-line"></i></span>
+            <span>Real-time Analytics Dashboard</span>
+          </div>
+          <div class="panel-feature">
+            <span class="feature-icon"><i class="fas fa-tree"></i></span>
+            <span>Eco Score & Activity Records</span>
+          </div>
+        </div>
+      </div>
+      <!-- Decorative shapes -->
+      <div class="panel-deco panel-deco--1"></div>
+      <div class="panel-deco panel-deco--2"></div>
+      <div class="panel-deco panel-deco--3"></div>
+    </div>
+
+    <!-- Right form panel -->
+    <div class="auth-panel auth-panel--right">
+      <div class="auth-card">
+        <!-- Logo on mobile only -->
+        <div class="auth-mobile-logo">
+          <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship" />
+          <span>Green Scholarship</span>
+        </div>
+
+        <div class="auth-card-header">
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">Login to access your Green Scholarship portal</p>
+        </div>
+
+        <!-- Alert box (hidden by default) -->
+        <div class="auth-alert" id="login-alert" role="alert"></div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-email" class="form-label">
+              <i class="fas fa-envelope"></i> Email / Username
+            </label>
+            <input
+              type="text"
+              id="login-email"
+              name="email"
+              class="form-input"
+              placeholder="Enter your email or username"
+              autocomplete="username"
+              required
+            />
+            <span class="form-error" id="login-email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password" class="form-label">
+              <i class="fas fa-lock"></i> Password
+            </label>
+            <div class="input-password-wrap">
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                class="form-input"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="password-toggle" id="login-pwd-toggle" aria-label="Toggle password visibility">
+                <i class="fas fa-eye" id="login-pwd-icon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="login-password-error"></span>
+          </div>
+
+          <div class="form-row form-row--space-between">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-me" name="remember" />
+              <span class="checkmark"></span>
+              Remember Me
+            </label>
+            <a href="#" class="link-text" id="forgot-password-link">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full" id="login-btn">
+            <span class="btn-text">Login</span>
+            <span class="btn-loader" id="login-loader" style="display:none;">
+              <i class="fas fa-circle-notch fa-spin"></i> Logging in…
+            </span>
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <div class="auth-footer-text">
+          Don't have an account?
+          <a href="#" class="link-text link-text--bold" id="go-to-register">Create Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 3 — REGISTRATION PAGE
+═══════════════════════════════════════════════════ -->
+<div id="screen-register" class="screen">
+  <div class="register-layout">
+    <div class="register-header">
+      <img src="{{ url_for('static', filename='images/gs-logo.png') }}" alt="Green Scholarship" class="register-logo" />
+      <div>
+        <h1 class="register-title">Create Your Green Scholarship Account</h1>
+        <p class="register-subtitle">Join thousands of students making a difference for the environment.</p>
+      </div>
+    </div>
+
+    <!-- Alert box -->
+    <div class="auth-alert" id="register-alert" role="alert"></div>
+
+    <form class="register-form" id="register-form" novalidate>
+
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-user-circle"></i> Personal Information</h3>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label for="reg-student-id" class="form-label">Student ID <span class="required">*</span></label>
+            <input type="text" id="reg-student-id" name="student_id" class="form-input" placeholder="e.g. STU-2024-001" required />
+            <span class="form-error" id="err-student-id"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-name" class="form-label">Full Name <span class="required">*</span></label>
+            <input type="text" id="reg-name" name="full_name" class="form-input" placeholder="Your full name" required />
+            <span class="form-error" id="err-name"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-email" class="form-label">Email Address <span class="required">*</span></label>
+            <input type="email" id="reg-email" name="email" class="form-input" placeholder="student@email.com" required />
+            <span class="form-error" id="err-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-phone" class="form-label">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="reg-phone" name="phone" class="form-input" placeholder="10-digit phone number" maxlength="10" pattern="[0-9]{10}" required />
+            <span class="form-error" id="err-phone"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-gender" class="form-label">Gender <span class="required">*</span></label>
+            <select id="reg-gender" name="gender" class="form-input form-select" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+            <span class="form-error" id="err-gender"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-dob" class="form-label">Date of Birth <span class="required">*</span></label>
+            <input type="date" id="reg-dob" name="dob" class="form-input" required />
+            <span class="form-error" id="err-dob"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Information -->
+      <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-graduation-cap"></i> Academic Information</h3>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label for="reg-college" class="form-label">College <span class="required">*</span></label>
+            <input type="text" id="reg-college" name="college" class="form-input" placeholder="Your college name" required />
+            <span class="form-error" id="err-college"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-course" class="form-label">Course <span class="required">*</span></label>
+            <input type="text" id="reg-course" name="course" class="form-input" placeholder="e.g. B.Sc Environmental Science" required />
+            <span class="form-error" id="err-course"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-district" class="form-label">District <span class="required">*</span></label>
+            <input type="text" id="reg-district" name="district" class="form-input" placeholder="Your district" required />
+            <span class="form-error" id="err-district"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Security -->
+      <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-shield-alt"></i> Account Security</h3>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password <span class="required">*</span></label>
+            <div class="input-password-wrap">
+              <input type="password" id="reg-password" name="password" class="form-input" placeholder="Minimum 8 characters" required />
+              <button type="button" class="password-toggle" id="reg-pwd-toggle" aria-label="Toggle password">
+                <i class="fas fa-eye" id="reg-pwd-icon"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="password-strength">
+              <div class="strength-bar" id="strength-bar"></div>
+            </div>
+            <span class="strength-label" id="strength-label"></span>
+            <span class="form-error" id="err-password"></span>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm-password" class="form-label">Confirm Password <span class="required">*</span></label>
+            <div class="input-password-wrap">
+              <input type="password" id="reg-confirm-password" name="confirm_password" class="form-input" placeholder="Re-enter your password" required />
+              <button type="button" class="password-toggle" id="reg-confirm-pwd-toggle" aria-label="Toggle password">
+                <i class="fas fa-eye" id="reg-confirm-pwd-icon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="err-confirm-password"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="reg-terms" name="terms" required />
+          <span class="checkmark"></span>
+          I agree to the <a href="#" class="link-text">Terms &amp; Conditions</a> and <a href="#" class="link-text">Privacy Policy</a>
+        </label>
+        <span class="form-error" id="err-terms"></span>
+      </div>
+
+      <div class="form-row form-row--gap">
+        <button type="submit" class="btn btn--primary" id="register-btn">
+          <span class="btn-text"><i class="fas fa-user-plus"></i> Create Account</span>
+          <span class="btn-loader" id="register-loader" style="display:none;">
+            <i class="fas fa-circle-notch fa-spin"></i> Creating account…
+          </span>
+        </button>
+        <a href="#" class="btn btn--outline" id="go-to-login">
+          Already have an account? Login
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FORGOT PASSWORD MODAL
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="forgot-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+    <div class="modal-icon"><i class="fas fa-key"></i></div>
+    <h3 class="modal-title">Reset Password</h3>
+    <p class="modal-subtitle">Enter your registered email address and we'll send you a reset link.</p>
+    <div class="form-group">
+      <input type="email" id="forgot-email" class="form-input" placeholder="Enter your email address" />
+      <span class="form-error" id="forgot-email-error"></span>
+    </div>
+    <button class="btn btn--primary btn--full" id="forgot-submit-btn">
+      <i class="fas fa-paper-plane"></i> Send Reset Link
+    </button>
+    <div class="auth-alert" id="forgot-alert" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/portal.js') }}"></script>
+</body>
+</html>

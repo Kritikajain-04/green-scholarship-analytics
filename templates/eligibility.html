@@ -1,0 +1,694 @@
+{% extends "base.html" %}
+
+{% block title %}Check Scholarship Eligibility{% endblock %}
+{% block description %}Check your Green Scholarship eligibility based on live records from our Snowflake database.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}" />
+<style>
+  /* Custom Page Specific Styling for Eligibility Evaluator */
+  .eligibility-container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+  }
+  
+  .search-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 26px 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E2EFE2;
+    margin-bottom: 28px;
+  }
+  
+  .search-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  
+  .search-input-group {
+    flex: 1;
+    min-width: 260px;
+  }
+  
+  .search-input-group label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #173B2A;
+    margin-bottom: 8px;
+  }
+  
+  .search-input-group input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid #CFE2CF;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+    background: #FDFEFE;
+  }
+  
+  .search-input-group input:focus {
+    border-color: #006B3C;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.12);
+  }
+
+  .quick-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .quick-select-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #5A7A6A;
+  }
+
+  .quick-chip {
+    display: inline-block;
+    background: #EAF6E8;
+    color: #006B3C;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #C8E6C9;
+    transition: all 0.15s ease;
+  }
+
+  .quick-chip:hover {
+    background: #006B3C;
+    color: #FFFFFF;
+  }
+  
+  .btn-check-eligibility {
+    background: linear-gradient(135deg, #006B3C, #2E7D32);
+    color: #FFFFFF;
+    border: none;
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.96rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 107, 60, 0.22);
+    height: 48px;
+  }
+  
+  .btn-check-eligibility:hover {
+    background: linear-gradient(135deg, #00542f, #236427);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 107, 60, 0.3);
+  }
+
+  .btn-check-eligibility:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Result Banner Cards */
+  .status-banner {
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    color: #FFFFFF;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.1);
+    animation: fadeInSlide 0.3s ease;
+  }
+
+  .status-banner.eligible {
+    background: linear-gradient(135deg, #1B7F3A, #2E7D32);
+    border-left: 8px solid #A5D6A7;
+  }
+
+  .status-banner.ineligible {
+    background: linear-gradient(135deg, #B71C1C, #D32F2F);
+    border-left: 8px solid #FFCDD2;
+  }
+
+  .status-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    flex-shrink: 0;
+  }
+
+  .status-text h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.3px;
+  }
+
+  .status-text p {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .reason-callout {
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  /* Info Cards */
+  .info-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid #E2EFE2;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+
+  .info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #006B3C;
+    border-bottom: 2px solid #F0F7F0;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px 24px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #5A7A6A;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #173B2A;
+  }
+
+  /* Metric Cards Grid */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .metric-card {
+    background: #F9FAF9;
+    border: 1px solid #E0EBE0;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: #FFFFFF;
+  }
+
+  .metric-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #E8F5E9;
+    color: #006B3C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .metric-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .metric-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #173B2A;
+  }
+
+  .metric-lbl {
+    font-size: 0.76rem;
+    color: #5A7A6A;
+    font-weight: 600;
+  }
+
+  /* Summary Badges Grid */
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .badge-card {
+    background: #FFFFFF;
+    border: 1px solid #E2EFE2;
+    border-radius: 12px;
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+
+  .badge-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #5A7A6A;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+  }
+
+  .badge-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #006B3C;
+  }
+
+  /* Error Alert Box */
+  .error-box {
+    background: #FFEBEE;
+    border: 1px solid #FFCDD2;
+    color: #C62828;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 24px;
+  }
+
+  @keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block nav_eligibility %}active{% endblock %}
+{% block mnav_eligibility %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title"><i class="fas fa-check-circle"></i> Check Scholarship Eligibility</h1>
+    <p class="page-subtitle">Verify your student eligibility status, eco score, and academic standing directly from the Snowflake dataset.</p>
+  </div>
+</div>
+
+<div class="container eligibility-container">
+  <!-- 1. STUDENT ID LOOKUP & SELECTION CARD -->
+  <div class="search-card">
+    <div class="search-row">
+      <div class="search-input-group">
+        <label for="student-id-input"><i class="fas fa-user-graduate" style="color: #006B3C;"></i> Enter or Select Student ID</label>
+        <input 
+          type="text" 
+          id="student-id-input" 
+          list="snowflake-students-list" 
+          placeholder="e.g. GS100001, GS100004 or student name" 
+          autocomplete="off" 
+        />
+        <datalist id="snowflake-students-list">
+          {% if students %}
+            {% for s in students %}
+              <option value="{{ s.id }}">{{ s.name }} ({{ s.id }})</option>
+            {% endfor %}
+          {% endif %}
+        </datalist>
+      </div>
+      <button type="button" class="btn-check-eligibility" id="btn-check-eligibility" onclick="checkEligibility()">
+        <i class="fas fa-search"></i> Check Eligibility
+      </button>
+    </div>
+
+    <!-- Quick select suggestion chips -->
+    <div class="quick-select-wrap">
+      <span class="quick-select-label">Quick test IDs from Snowflake:</span>
+      <span class="quick-chip" onclick="selectStudentId('GS100004')">GS100004 (Eligible)</span>
+      <span class="quick-chip" onclick="selectStudentId('GS100990')">GS100990 (Eligible)</span>
+      <span class="quick-chip" onclick="selectStudentId('GS100001')">GS100001 (Not Eligible)</span>
+      <span class="quick-chip" onclick="selectStudentId('GS100002')">GS100002 (Not Eligible)</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="eligibility-loading" style="display: none; text-align: center; padding: 40px 0;">
+    <div style="font-size: 2.5rem; color: #006B3C; margin-bottom: 12px;">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+    <p style="font-weight: 600; color: #173B2A; font-size: 1.05rem;">🔄 Fetching student data from Snowflake database...</p>
+  </div>
+
+  <!-- Error Alert Box -->
+  <div id="eligibility-error" class="error-box" style="display: none;">
+    <i class="fas fa-triangle-exclamation" style="font-size: 1.4rem;"></i>
+    <span id="error-message">⚠ Student Not Found. Please enter a valid Student ID.</span>
+  </div>
+
+  <!-- Results Content Wrapper -->
+  <div id="eligibility-results-wrapper" style="display: none;">
+    <!-- 2. ATTRACTIVE ELIGIBILITY RESULT CARD / BANNER -->
+    <div id="status-banner" class="status-banner eligible">
+      <div class="status-icon-box" id="status-icon"><i class="fas fa-check"></i></div>
+      <div class="status-text">
+        <h2 id="status-headline">Eligible for Green Scholarship</h2>
+        <p id="status-subtext">Congratulations! You meet all environmental, academic, and criteria thresholds for scholarship award.</p>
+        <div id="status-reason-box" class="reason-callout" style="display: none;">
+          <i class="fas fa-circle-info"></i> <span id="status-reason-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. STUDENT INFORMATION CARD -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <i class="fas fa-user-graduate"></i> Student Profile & Academic Background
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Student ID</span>
+          <span class="info-value" id="val-student-id">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Student Name</span>
+          <span class="info-value" id="val-student-name">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">College / University</span>
+          <span class="info-value" id="val-college">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Course / Branch</span>
+          <span class="info-value" id="val-course">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Academic Percentage</span>
+          <span class="info-value" id="val-percentage-info" style="color: #0288D1; font-size: 1.05rem;">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Annual Family Income</span>
+          <span class="info-value" id="val-family-income">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">District</span>
+          <span class="info-value" id="val-district">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Scholarship Type</span>
+          <span class="info-value" id="val-scholarship">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ENVIRONMENTAL ACTIVITIES & ECO SCORE METRICS -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <i class="fas fa-leaf"></i> Environmental Activities & Performance
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-card" style="background: #EAF6E8; border-color: #A5D6A7;">
+          <div class="metric-icon" style="background: #006B3C; color: #FFFFFF;"><i class="fas fa-seedling"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" style="color: #006B3C;" id="val-eco-score">0</span>
+            <span class="metric-lbl" style="color: #006B3C; font-weight: 700;">Eco / Green Score</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-tree"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-trees">0</span>
+            <span class="metric-lbl">Trees Planted</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-earth-americas"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-green-activities">0</span>
+            <span class="metric-lbl">Total Green Activities</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-clock"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-hours">0 hrs</span>
+            <span class="metric-lbl">Volunteer Hours</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-recycle"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-drives">0</span>
+            <span class="metric-lbl">Recycling Drives</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-hand-holding-droplet"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-water">0</span>
+            <span class="metric-lbl">Water Conservation</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-broom"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-campus">0</span>
+            <span class="metric-lbl">Campus Cleaning</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-bolt"></i></div>
+          <div class="metric-info">
+            <span class="metric-val" id="val-energy">0</span>
+            <span class="metric-lbl">Energy Campaigns</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ELIGIBILITY DETAILS SUMMARY BADGES -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <i class="fas fa-award"></i> Evaluation Summary
+      </div>
+      <div class="badges-grid">
+        <div class="badge-card">
+          <div class="badge-title">Eco / Green Score</div>
+          <div class="badge-value" id="summary-green-score">0</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-title">Academic Percentage</div>
+          <div class="badge-value" id="summary-percentage">0%</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-title">Eligibility Status</div>
+          <div class="badge-value" id="summary-status">—</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-title">Scholarship Track</div>
+          <div class="badge-value" id="summary-scholarship">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectStudentId(id) {
+  document.getElementById('student-id-input').value = id;
+  checkEligibility();
+}
+
+async function checkEligibility() {
+  const inputEl = document.getElementById('student-id-input');
+  const btn = document.getElementById('btn-check-eligibility');
+  const loadingEl = document.getElementById('eligibility-loading');
+  const errorEl = document.getElementById('eligibility-error');
+  const errorMsg = document.getElementById('error-message');
+  const resultsWrapper = document.getElementById('eligibility-results-wrapper');
+
+  let studentId = (inputEl.value || '').trim();
+  // Extract ID if user picked "Tara Nori (GS100001)" format
+  const idMatch = studentId.match(/GS\d+/i);
+  if (idMatch) {
+    studentId = idMatch[0];
+  }
+
+  if (!studentId) {
+    errorEl.style.display = 'flex';
+    errorMsg.textContent = '⚠ Please enter or select a Student ID to check eligibility.';
+    resultsWrapper.style.display = 'none';
+    return;
+  }
+
+  const apiUrl = `/api/students/${encodeURIComponent(studentId)}/eligibility`;
+
+  // Reset UI state
+  errorEl.style.display = 'none';
+  resultsWrapper.style.display = 'none';
+  loadingEl.style.display = 'block';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'flex';
+      errorMsg.textContent = `⚠ ${data.message || 'Student Not Found in Snowflake. Please enter a valid Student ID.'}`;
+      btn.disabled = false;
+      return;
+    }
+
+    // Extract student record safely from Snowflake API response
+    const s = data.student || data;
+
+    // Populate Student Information Card
+    document.getElementById('val-student-id').textContent = s.student_id || '—';
+    document.getElementById('val-student-name').textContent = s.student_name || s.name || '—';
+    document.getElementById('val-college').textContent = s.college || '—';
+    document.getElementById('val-course').textContent = s.course || '—';
+    document.getElementById('val-district').textContent = s.district || '—';
+    document.getElementById('val-percentage-info').textContent = `${s.percentage ?? 0}%`;
+    document.getElementById('val-family-income').textContent = s.family_income != null ? `₹${Number(s.family_income).toLocaleString('en-IN')}` : 'Not Specified';
+    document.getElementById('val-scholarship').textContent = s.scholarship_type || '—';
+
+    // Populate Environmental & Academic Metrics
+    const ecoScore = s.green_score ?? 0;
+    document.getElementById('val-eco-score').textContent = ecoScore;
+    document.getElementById('val-trees').textContent = s.trees_planted ?? 0;
+    document.getElementById('val-green-activities').textContent = s.green_activities ?? (s.trees_planted || 0);
+    document.getElementById('val-hours').textContent = `${s.volunteer_hours ?? 0} hrs`;
+    document.getElementById('val-drives').textContent = s.recycling_drives ?? 0;
+    document.getElementById('val-water').textContent = s.water_conservation ?? 0;
+    document.getElementById('val-campus').textContent = s.campus_cleaning ?? 0;
+    document.getElementById('val-energy').textContent = s.energy_campaigns ?? 0;
+
+    // Populate Summary Badges
+    document.getElementById('summary-green-score').textContent = ecoScore;
+    document.getElementById('summary-percentage').textContent = `${s.percentage ?? 0}%`;
+    document.getElementById('summary-status').textContent = s.eligibility || '—';
+    document.getElementById('summary-scholarship').textContent = s.scholarship_type || '—';
+
+    // Configure Result Banner based on actual Snowflake eligibility status
+    const isEligible = String(s.eligibility).trim().toLowerCase() === 'eligible';
+    const banner = document.getElementById('status-banner');
+    const icon = document.getElementById('status-icon');
+    const headline = document.getElementById('status-headline');
+    const subtext = document.getElementById('status-subtext');
+    const reasonBox = document.getElementById('status-reason-box');
+    const reasonText = document.getElementById('status-reason-text');
+
+    if (isEligible) {
+      banner.className = 'status-banner eligible';
+      icon.innerHTML = '<i class="fas fa-check"></i>';
+      headline.textContent = 'Eligible for Green Scholarship';
+      subtext.textContent = 'Congratulations! The student meets the environmental activity and academic thresholds from the Snowflake dataset.';
+      document.getElementById('summary-status').style.color = '#1B7F3A';
+      
+      // Generate reason from real metrics
+      reasonBox.style.display = 'inline-block';
+      reasonText.textContent = `Qualified with Eco Score of ${ecoScore} and Academic Performance of ${s.percentage}%.`;
+    } else {
+      banner.className = 'status-banner ineligible';
+      icon.innerHTML = '<i class="fas fa-xmark"></i>';
+      headline.textContent = 'Not Eligible';
+      subtext.textContent = 'The student does not currently satisfy the minimum threshold criteria recorded in the Snowflake dataset.';
+      document.getElementById('summary-status').style.color = '#D32F2F';
+
+      // Generate helpful reason based on Snowflake record
+      reasonBox.style.display = 'inline-block';
+      const reasons = [];
+      if ((s.green_score || 0) < 300) {
+        reasons.push(`Eco Score (${s.green_score || 0}) is below target benchmark`);
+      }
+      if ((s.percentage || 0) < 70) {
+        reasons.push(`Academic Percentage (${s.percentage || 0}%) is below requirement`);
+      }
+      if (s.family_income && s.family_income > 50000) {
+        reasons.push(`Annual income benchmark criteria not matched`);
+      }
+      if (reasons.length === 0) {
+        reasons.push('Overall weighted score does not satisfy current funding quota.');
+      }
+      reasonText.textContent = `Reason: ${reasons.join('; ')}.`;
+    }
+
+    loadingEl.style.display = 'none';
+    resultsWrapper.style.display = 'block';
+
+  } catch (err) {
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'flex';
+    errorMsg.textContent = '⚠ Unable to connect to the analytics server. Please try again later.';
+    console.error('Eligibility check error:', err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Allow Enter key to trigger check
+document.getElementById('student-id-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') checkEligibility();
+});
+</script>
+{% endblock %}

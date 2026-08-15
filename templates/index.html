@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Scholarship Analytics System</title>
+  <meta name="description" content="Enterprise analytics dashboard for the Green Scholarship program — live data from Snowflake." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/student-selector.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR NAVIGATION
+═══════════════════════════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+    <div class="logo-text">
+      <span class="logo-title">Green Scholarship</span>
+      <span class="logo-subtitle">Analytics System</span>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <button class="nav-item active" id="nav-overview"       onclick="showPage('overview')">
+      <i class="fas fa-chart-line"></i><span>Overview</span>
+    </button>
+    <button class="nav-item" id="nav-academic"              onclick="showPage('academic')">
+      <i class="fas fa-graduation-cap"></i><span>Academic Analysis</span>
+    </button>
+    <button class="nav-item" id="nav-environmental"         onclick="showPage('environmental')">
+      <i class="fas fa-tree"></i><span>Environmental</span>
+    </button>
+    <button class="nav-item" id="nav-scholarship"           onclick="showPage('scholarship')">
+      <i class="fas fa-award"></i><span>Scholarship Analysis</span>
+    </button>
+    <button class="nav-item" id="nav-students"              onclick="showPage('students')">
+      <i class="fas fa-users"></i><span>Student Details</span>
+    </button>
+    <div style="margin: 16px 24px; height: 1px; background: rgba(255,255,255,0.15);"></div>
+    <button class="nav-item" onclick="window.location.href='/home'" style="opacity: 0.85;">
+      <i class="fas fa-arrow-left"></i><span>Back to Home</span>
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-text">
+      <i class="fas fa-database"></i>&nbsp;Live · Snowflake
+    </div>
+    <div class="connection-dot"></div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════ -->
+<div class="main-content">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title" id="page-title">Dashboard Overview</h1>
+      <span class="page-badge" id="page-badge" style="display: inline-flex; align-items: center; gap: 6px; background: #E8F5E9; color: #1B7F3A; font-weight: 700;">
+        <i class="fas fa-circle" id="snowflake-status-dot" style="color: #2E7D32; font-size: 0.65rem;"></i>
+        <span id="snowflake-status-text">🟢 Live • Snowflake</span>
+      </span>
+      <span style="font-size: 0.8rem; color: #5A7A6A; font-weight: 500; margin-left: 10px;" id="last-updated-text">
+        <i class="fas fa-clock"></i> Last Updated: Fetching...
+      </span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilters()">
+        <i class="fas fa-sliders-h"></i> Filters
+      </button>
+      <button class="btn-reset" id="resetBtn" onclick="resetFilters()">
+        <i class="fas fa-rotate-left"></i> Reset
+      </button>
+      <div class="topbar-time" id="topbarTime"></div>
+    </div>
+  </header>
+
+  <!-- FILTER PANEL -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label><i class="fas fa-map-marker-alt"></i> District</label>
+        <select id="f-district" onchange="applyFilters()"><option value="">All Districts</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-university"></i> College</label>
+        <select id="f-college" onchange="applyFilters()"><option value="">All Colleges</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-book"></i> Course</label>
+        <select id="f-course" onchange="applyFilters()"><option value="">All Courses</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-venus-mars"></i> Gender</label>
+        <select id="f-gender" onchange="applyFilters()"><option value="">All Genders</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-calendar"></i> Year</label>
+        <select id="f-year" onchange="applyFilters()"><option value="">All Years</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-award"></i> Scholarship Type</label>
+        <select id="f-scholarship" onchange="applyFilters()"><option value="">All Types</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-check-circle"></i> Eligibility</label>
+        <select id="f-eligibility" onchange="applyFilters()"><option value="">All</option></select>
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-users-between-lines"></i> NSS / NCC</label>
+        <select id="f-nss-ncc" onchange="applyFilters()"><option value="">All</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════
+       KPI CARDS (shared)
+  ══════════════════════ -->
+  <div class="kpi-strip" id="kpiStrip">
+    <div class="kpi-card primary">
+      <div class="kpi-icon"><i class="fas fa-users"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-label">Total Students</div>
+      </div>
+    </div>
+    <div class="kpi-card success">
+      <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-eligible">—</div>
+        <div class="kpi-label">Eligible Students</div>
+      </div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-icon"><i class="fas fa-star"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-green-score">—</div>
+        <div class="kpi-label">Avg Green Score</div>
+      </div>
+    </div>
+    <div class="kpi-card info">
+      <div class="kpi-icon"><i class="fas fa-percent"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-percentage">—</div>
+        <div class="kpi-label">Avg Percentage</div>
+      </div>
+    </div>
+    <div class="kpi-card eco">
+      <div class="kpi-icon"><i class="fas fa-tree"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-trees">—</div>
+        <div class="kpi-label">Trees Planted</div>
+      </div>
+    </div>
+    <div class="kpi-card warm">
+      <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-vol-hours">—</div>
+        <div class="kpi-label">Volunteer Hours</div>
+      </div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-icon"><i class="fas fa-recycle"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-recycling">—</div>
+        <div class="kpi-label">Recycling Drives</div>
+      </div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-icon"><i class="fas fa-droplet"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-water">—</div>
+        <div class="kpi-label">Water Conservation</div>
+      </div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-icon"><i class="fas fa-broom"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-campus">—</div>
+        <div class="kpi-label">Campus Cleaning</div>
+      </div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-icon"><i class="fas fa-bolt"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-value" id="kpi-energy">—</div>
+        <div class="kpi-label">Energy Campaigns</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: OVERVIEW
+  ══════════════════════════════ -->
+  <section class="page-section active" id="page-overview">
+    <div class="chart-grid grid-2">
+      <div class="chart-card span-2">
+        <div class="chart-header">
+          <h3><i class="fas fa-trophy"></i> Top 10 Colleges by Eligible Students</h3>
+        </div>
+        <div class="chart-body"><canvas id="chart-top-colleges"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-venus-mars"></i> Gender Distribution</h3></div>
+        <div class="chart-body chart-sm"><canvas id="chart-gender"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-award"></i> Scholarship Type Distribution</h3></div>
+        <div class="chart-body chart-sm"><canvas id="chart-scholarship-dist"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-chart-line"></i> Students by Year (Trend)</h3></div>
+        <div class="chart-body"><canvas id="chart-year-trend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Eligibility Status</h3></div>
+        <div class="chart-body chart-sm"><canvas id="chart-eligibility"></canvas></div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-gauge-high"></i> Green Score Distribution</h3></div>
+        <div class="chart-body"><canvas id="chart-green-score-dist"></canvas></div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-leaf"></i> Environmental Activities by District</h3></div>
+        <div class="chart-body"><canvas id="chart-env-activities"></canvas></div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-ranking-star"></i> Top Eco-Friendly Colleges (Avg Green Score)</h3></div>
+        <div class="chart-body"><canvas id="chart-eco-colleges"></canvas></div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-map-location-dot"></i> District-wise Student Distribution</h3></div>
+        <div class="chart-body"><canvas id="chart-district-bar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- KEY INSIGHTS -->
+    <div class="key-insights-section" style="margin-top: 24px; padding: 24px; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(27,94,32,0.08); border: 1px solid #D7E8D7;">
+      <h3 style="margin-bottom: 16px; color: #1B5E20; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-lightbulb" style="color: #FBC02D;"></i> Dynamic Key Insights
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="padding: 12px; background: #E8F5E9; border-radius: 8px; border-left: 4px solid #2E7D32;">
+          <div style="font-size: 0.85rem; color: #3A5C3C; font-weight: 600;">Eligibility Rate</div>
+          <div id="insight-elig-rate" style="font-size: 1.25rem; font-weight: 800; color: #1B5E20; margin-top: 4px;">—</div>
+        </div>
+        <div style="padding: 12px; background: #E8F5E9; border-radius: 8px; border-left: 4px solid #43A047;">
+          <div style="font-size: 0.85rem; color: #3A5C3C; font-weight: 600;">Highest Green Score District</div>
+          <div id="insight-top-district" style="font-size: 1.25rem; font-weight: 800; color: #1B5E20; margin-top: 4px; word-break: break-word;">—</div>
+        </div>
+        <div style="padding: 12px; background: #E1F5FE; border-radius: 8px; border-left: 4px solid #0277BD;">
+          <div style="font-size: 0.85rem; color: #3A5C3C; font-weight: 600;">Top Eligible College</div>
+          <div id="insight-top-college" style="font-size: 1.1rem; font-weight: 800; color: #01579B; margin-top: 4px; word-break: break-word;">—</div>
+        </div>
+        <div style="padding: 12px; background: #FFF3E0; border-radius: 8px; border-left: 4px solid #E65100;">
+          <div style="font-size: 0.85rem; color: #3A5C3C; font-weight: 600;">Environmental Leader</div>
+          <div id="insight-env-leader" style="font-size: 1.1rem; font-weight: 800; color: #BF360C; margin-top: 4px; word-break: break-word;">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       PAGE: ACADEMIC ANALYSIS
+  ══════════════════════════════ -->
+  <section class="page-section" id="page-academic">
+    <div class="chart-grid grid-2">
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-university"></i> College Performance — Avg % vs Green Score</h3></div>
+        <div class="chart-body"><canvas id="chart-college-perf"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-book-open"></i> Course Analysis — Avg Percentage</h3></div>
+        <div class="chart-body"><canvas id="chart-course-perf"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-venus-mars"></i> Gender Performance</h3></div>
+        <div class="chart-body chart-sm"><canvas id="chart-gender-perf"></canvas></div>
+      </div>
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-calendar-alt"></i> Year-wise Academic Trend</h3></div>
+        <div class="chart-body"><canvas id="chart-year-perf"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       PAGE: ENVIRONMENTAL ANALYSIS
+  ══════════════════════════════ -->
+  <section class="page-section" id="page-environmental">
+    <div class="chart-grid grid-2">
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-tree"></i> District Environmental Breakdown</h3></div>
+        <div class="chart-body"><canvas id="chart-district-env"></canvas></div>
+      </div>
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-medal"></i> Top Environmental Contributor Colleges</h3></div>
+        <div class="chart-body"><canvas id="chart-top-contributors"></canvas></div>
+      </div>
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-star"></i> Avg Green Score by District</h3></div>
+        <div class="chart-body"><canvas id="chart-district-score"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       PAGE: SCHOLARSHIP ANALYSIS
+  ══════════════════════════════ -->
+  <section class="page-section" id="page-scholarship">
+    <div class="chart-grid grid-2">
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-award"></i> Scholarship Type — Total vs Eligible</h3></div>
+        <div class="chart-body"><canvas id="chart-scholarship-type"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-map-marker-alt"></i> District-wise Eligibility</h3></div>
+        <div class="chart-body"><canvas id="chart-district-elig"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3><i class="fas fa-gauge-high"></i> Eligibility Rate by Scholarship Type</h3></div>
+        <div class="chart-body chart-sm"><canvas id="chart-elig-rate"></canvas></div>
+      </div>
+      <div class="chart-card span-2">
+        <div class="chart-header"><h3><i class="fas fa-university"></i> College-wise Eligibility (Top 15)</h3></div>
+        <div class="chart-body"><canvas id="chart-college-elig"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       PAGE: STUDENT DETAILS
+  ══════════════════════════════ -->
+  <section class="page-section" id="page-students">
+    <div class="students-toolbar">
+      <div class="toolbar-left">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="studentSearch" placeholder="Search by name, ID, college, or district…" oninput="debounceStudentLoad()" />
+        </div>
+        
+        <!-- DYNAMIC FIELD SELECTOR DROPDOWN -->
+        <div class="field-selector-dropdown">
+          <button type="button" class="btn-field-selector" id="btnFieldSelector" onclick="toggleFieldSelector()">
+            <i class="fas fa-columns"></i> Select Fields <span class="field-count-badge" id="selectedFieldCount">0</span> <i class="fas fa-chevron-down"></i>
+          </button>
+          
+          <div class="field-selector-panel" id="fieldSelectorPanel">
+            <div class="field-selector-header">
+              <h4><i class="fas fa-list-check"></i> Choose Columns</h4>
+              <button type="button" class="close-panel-btn" onclick="toggleFieldSelector()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="field-selector-search">
+              <input type="text" id="fieldSearchInput" placeholder="Search fields…" oninput="filterFieldSelectorList()" />
+            </div>
+
+            <div class="field-selector-actions">
+              <button type="button" class="action-link" onclick="selectAllFields(true)"><i class="fas fa-check-double"></i> Select All</button>
+              <button type="button" class="action-link" onclick="selectAllFields(false)"><i class="fas fa-eraser"></i> Clear All</button>
+              <button type="button" class="action-link" onclick="resetDefaultFields()"><i class="fas fa-undo"></i> Reset Default</button>
+            </div>
+
+            <div class="field-checkbox-list" id="fieldCheckboxList">
+              <!-- Dynamically populated from Snowflake API response -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <div class="rows-per-page">
+          <label for="pageSizeSelect">Rows:</label>
+          <select id="pageSizeSelect" onchange="changePageSize(this.value)">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <span class="record-count" id="recordCount">Loading…</span>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table id="studentTable">
+          <thead id="studentTableHead">
+            <!-- Dynamically populated headers -->
+          </thead>
+          <tbody id="studentTableBody">
+            <tr><td colspan="10" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination" id="tablePagination"></div>
+    </div>
+  </section>
+
+</div><!-- end .main-content -->
+
+<!-- ══════════════════════════════
+     STUDENT PROFILE MODAL
+══════════════════════════════ -->
+<div class="modal-overlay" id="studentModalOverlay" onclick="closeStudentModal(event)">
+  <div class="student-modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar"><i class="fas fa-user-graduate"></i></div>
+        <div>
+          <h3 id="modalStudentName">Student Profile</h3>
+          <p id="modalStudentId" class="modal-subtitle">ID: —</p>
+        </div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeStudentModal()"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="modal-body" id="modalStudentDetails">
+      <!-- Dynamic detailed sections (Student Info, Academic Info, Environmental, Financial, etc.) -->
+    </div>
+  </div>
+</div>
+
+<!-- Loader Overlay -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-box">
+    <div class="loader-spinner"></div>
+    <p>Connecting to Snowflake…</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

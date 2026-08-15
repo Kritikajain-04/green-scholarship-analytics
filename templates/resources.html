@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Resources
+
+
+{% endblock %}
+{% block description %}Green Scholarship Resources — Downloads, guidelines, FAQs, and environmental impact documentation.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}" />
+{% endblock %}
+
+{% block nav_resources %}active{% endblock %}
+{% block mnav_resources %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title"><i class="fas fa-book-open"></i> Student Resources & Guidelines</h1>
+    <p class="page-subtitle">Access scholarship guidelines, required document templates, FAQs, and sustainability toolkits.</p>
+  </div>
+</div>
+
+<div class="container page-container">
+  <!-- Guidelines & Documentation Cards -->
+  <div id="guidelines" class="section-header" style="margin-bottom: 2rem; text-align: left; scroll-margin-top: 80px;">
+    <h2><i class="fas fa-file-pdf" style="color: #1B7F3A;"></i> Downloadable Guides & Templates</h2>
+  </div>
+
+  <div class="form-grid" style="margin-bottom: 3rem;">
+    <div class="card card--form" style="padding: 1.5rem;">
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="font-size: 2rem; color: #1B7F3A;"><i class="fas fa-file-invoice"></i></div>
+        <div>
+          <h3 style="font-size: 1.1rem; color: #173B2A; margin-bottom: 0.4rem;">Scholarship Application Guidelines</h3>
+          <p style="font-size: 0.85rem; color: #5A7A6A; margin-bottom: 1rem;">Comprehensive document detailing eligibility criteria, required documents, and evaluation criteria.</p>
+          <a href="{{ url_for('static', filename='downloads/Green_Scholarship_Guidelines_2026.pdf') }}" download class="btn btn--hero-outline" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fas fa-download"></i> Download PDF (1.2 MB)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--form" style="padding: 1.5rem;">
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="font-size: 2rem; color: #0288D1;"><i class="fas fa-tree"></i></div>
+        <div>
+          <h3 style="font-size: 1.1rem; color: #173B2A; margin-bottom: 0.4rem;">Tree Plantation Proof Certificate</h3>
+          <p style="font-size: 0.85rem; color: #5A7A6A; margin-bottom: 1rem;">Official verification template for submitting photo proof and officer signatures for tree plantation.</p>
+          <a href="{{ url_for('static', filename='downloads/Plantation_Verification_Form.pdf') }}" download class="btn btn--hero-outline" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fas fa-download"></i> Download Form (850 KB)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--form" style="padding: 1.5rem;">
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="font-size: 2rem; color: #ED6C02;"><i class="fas fa-hands-helping"></i></div>
+        <div>
+          <h3 style="font-size: 1.1rem; color: #173B2A; margin-bottom: 0.4rem;">NSS / NCC Volunteer Log Logbook</h3>
+          <p style="font-size: 0.85rem; color: #5A7A6A; margin-bottom: 1rem;">Logbook sheet to track community service hours, recycling drives, and coordinator signatures.</p>
+          <a href="{{ url_for('static', filename='downloads/Volunteer_Logbook_Template.pdf') }}" download class="btn btn--hero-outline" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fas fa-download"></i> Download Logbook (620 KB)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--form" style="padding: 1.5rem;">
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="font-size: 2rem; color: #9C27B0;"><i class="fas fa-award"></i></div>
+        <div>
+          <h3 style="font-size: 1.1rem; color: #173B2A; margin-bottom: 0.4rem;">Income & Bonafide Certificate Sample</h3>
+          <p style="font-size: 0.85rem; color: #5A7A6A; margin-bottom: 1rem;">Sample format of income certificate and college bonafide certificate for verification.</p>
+          <a href="{{ url_for('static', filename='downloads/Bonafide_Sample_Format.pdf') }}" download class="btn btn--hero-outline" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fas fa-download"></i> Download Sample (500 KB)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frequently Asked Questions -->
+  <div id="faqs" class="section-header" style="margin-bottom: 2rem; text-align: left; scroll-margin-top: 80px;">
+    <h2><i class="fas fa-question-circle" style="color: #1B7F3A;"></i> Frequently Asked Questions (FAQs)</h2>
+  </div>
+
+  <div class="card card--form" style="max-width: 100%;">
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <h4 style="color: #075E3D; font-size: 1rem; margin-bottom: 0.3rem;"><i class="fas fa-circle-question"></i> Who is eligible for the Green Scholarship?</h4>
+        <p style="font-size: 0.9rem; color: #5A7A6A; line-height: 1.6;">Students enrolled in accredited colleges across Karnataka with valid academic records and active participation in environmental activities (tree plantation, recycling, volunteer hours) are eligible to apply.</p>
+      </div>
+      <hr style="border: 0; border-top: 1px solid #EAF6E8;">
+      <div>
+        <h4 style="color: #075E3D; font-size: 1rem; margin-bottom: 0.3rem;"><i class="fas fa-circle-question"></i> How is the Green Score calculated?</h4>
+        <p style="font-size: 0.9rem; color: #5A7A6A; line-height: 1.6;">The Green Score is calculated using a weighted formula based on Trees Planted (3x), Volunteer Hours (1.5x), Recycling Drives (5x), and Academic Percentage (5x).</p>
+      </div>
+      <hr style="border: 0; border-top: 1px solid #EAF6E8;">
+      <div>
+        <h4 style="color: #075E3D; font-size: 1rem; margin-bottom: 0.3rem;"><i class="fas fa-circle-question"></i> What documents are required for application?</h4>
+        <p style="font-size: 0.9rem; color: #5A7A6A; line-height: 1.6;">You need a valid Student ID, College Bonafide Certificate, Academic Marksheet, Activity Verification Proof (Signed by NSS/College Coordinator), and Family Income Certificate.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

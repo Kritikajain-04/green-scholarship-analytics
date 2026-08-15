@@ -1,0 +1,171 @@
+/* ═══════════════════════════════════════════════════════
+   GREEN SCHOLARSHIP — PAGES STYLING (Phase 3+)
+═══════════════════════════════════════════════════════ */
+
+.page-header {
+  background: linear-gradient(135deg, var(--clr-dark-forest), var(--clr-primary));
+  color: var(--clr-white);
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  font-size: 1.0625rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.page-container {
+  padding: 3rem 1.5rem;
+}
+
+.card--form {
+  background: var(--clr-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid var(--clr-border);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.form-group--full {
+  grid-column: span 2;
+}
+
+.form-section-title {
+  grid-column: span 2;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  border-bottom: 2px solid var(--clr-light);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.eligibility-divider {
+  text-align: center;
+  margin: 2rem 0;
+  position: relative;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--clr-muted);
+}
+.eligibility-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--clr-border);
+  z-index: 1;
+}
+.eligibility-divider span {
+  position: relative;
+  z-index: 2;
+  background: var(--clr-white);
+  padding: 0 1rem;
+}
+
+.result-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.result-card--success {
+  background: var(--clr-light);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-dark-forest);
+}
+.result-card--warning {
+  background: #FFF3E0;
+  border: 1px solid #FFE0B2;
+  color: #E65100;
+}
+
+.result-icon {
+  font-size: 2.5rem;
+}
+
+.score-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: var(--clr-white);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group--full {
+    grid-column: span 1;
+  }
+  .search-box {
+    flex-direction: column;
+  }
+  .search-box button {
+    width: 100%;
+  }
+}
+
+/* ─── Top Notification Banner in Apply Page ─── */
+.apply-top-notification {
+  background: linear-gradient(90deg, #1B7F3A, #075E3D);
+  color: white;
+  padding: 10px 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.close-notification-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.close-notification-btn:hover {
+  opacity: 1;
+}

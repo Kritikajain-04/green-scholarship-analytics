@@ -1,0 +1,50 @@
+﻿# ─── Secrets / Environment ─────────────────────────────────
+.env
+*.env
+
+# ─── Python bytecode ───────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+
+# ─── Virtual environments ──────────────────────────────────
+venv/
+.venv/
+env/
+.env/
+
+# ─── Large data files (do not push to GitHub) ──────────────
+data/*.csv
+data/*.xlsx
+data/*.xls
+data/*.pbix
+data/GSA.pbix
+
+# ─── Alteryx workflows ─────────────────────────────────────
+alteryx/
+
+# ─── UiPath ────────────────────────────────────────────────
+ uipath/
+
+# ─── Reports ───────────────────────────────────────────────
+reports/
+
+# ─── IDE / Editor ──────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+
+# ─── OS artefacts ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Logs ──────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Build artifacts ───────────────────────────────────────
+dist/
+build/
+*.egg-info/

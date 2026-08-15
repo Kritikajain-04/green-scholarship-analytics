@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block description %}Green Scholarship — Apply for scholarships and track your environmental impact.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}" />
+{% endblock %}
+
+{% block nav_home %}active{% endblock %}
+{% block mnav_home %}active{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="container hero__inner">
+
+    <!-- Left: Text Content -->
+    <div class="hero__text" data-animate="fade-up">
+      <div class="hero__badge">
+        <i class="fas fa-leaf"></i>
+        Scholarship for Sustainability
+      </div>
+      <h1 class="hero__heading">
+        Green Scholarship<br>
+        <span class="hero__heading-accent">for a Sustainable Future</span>
+      </h1>
+      <p class="hero__subtitle">
+        Encouraging students who contribute towards a greener environment
+        and a better tomorrow. Apply now and make your eco-impact count.
+      </p>
+      <div class="hero__actions">
+        <a href="/apply" class="btn btn--hero-primary">
+          <i class="fas fa-file-signature"></i>
+          Apply Now
+        </a>
+        <a href="/eligibility" class="btn btn--hero-outline">
+          <i class="fas fa-leaf"></i>
+          Check Eligibility
+        </a>
+      </div>
+      <div class="hero__trust">
+        <div class="trust-item">
+          <i class="fas fa-check-circle"></i>
+          Free to apply
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-check-circle"></i>
+          No hidden fees
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-check-circle"></i>
+          Environment-first
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Illustration -->
+    <div class="hero__illustration" data-animate="fade-left">
+      <div class="hero__illustration-wrap">
+        <img
+          src="{{ url_for('static', filename='images/hero-illustration.png') }}"
+          alt="Green Scholarship Environmental Illustration — Globe, graduation cap, trees and renewable energy"
+          class="hero__img"
+          loading="eager"
+        />
+        <!-- Floating accent badges -->
+        <div class="hero__float hero__float--1">
+          <i class="fas fa-tree"></i>
+          <span>Eco Impact</span>
+        </div>
+        <div class="hero__float hero__float--2">
+          <i class="fas fa-graduation-cap"></i>
+          <span>Scholarships</span>
+        </div>
+        <div class="hero__float hero__float--3">
+          <i class="fas fa-globe-asia"></i>
+          <span>Sustainability</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Decorative wave divider -->
+  <div class="hero__wave">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     LIVE SCHOLARSHIP IMPACT (LIVE SNOWFLAKE DATA)
+═══════════════════════════════════════════════════ -->
+<section class="stats-section" id="stats-section">
+  <div class="container">
+
+    <div class="section-header" style="margin-bottom: 2rem; text-align: center;">
+      <div class="live-badge-wrap" style="display: inline-flex; align-items: center; gap: 8px; background: #E8F5E9; color: #1B7F3A; padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; margin-bottom: 12px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #2E7D32; display: inline-block; animation: pulse 1.5s infinite;"></span>
+        ● Live Data • Snowflake
+      </div>
+      <h2 class="section-title">Live Scholarship Impact</h2>
+      <p class="section-subtitle">Real-time aggregations fetched directly from our official Snowflake data warehouse.</p>
+    </div>
+
+    <!-- Loading skeleton state -->
+    <div class="stats-loading" id="stats-loading">
+      <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: #1B7F3A; margin-bottom: 10px;"></i>
+      <p style="font-weight: 600; color: #173B2A;">Retrieving live statistics from Snowflake...</p>
+    </div>
+
+    <!-- Live Stats grid -->
+    <div class="stats-grid" id="stats-grid" style="display:none;">
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--students">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-total-students">—</div>
+          <div class="stat-card__label">Total Students</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--students" style="background: #EAF6E8; color: #1B7F3A;">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-eligible-students">—</div>
+          <div class="stat-card__label">Eligible Students</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #E8F5E9; color: #2E7D32;">
+          <i class="fas fa-seedling"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-avg-green-score">—</div>
+          <div class="stat-card__label">Avg Green Score</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #E3F2FD; color: #0288D1;">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-avg-percentage">—</div>
+          <div class="stat-card__label">Avg Percentage</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--trees">
+          <i class="fas fa-tree"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-trees">—</div>
+          <div class="stat-card__label">Trees Planted</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--hours">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-volunteer">—</div>
+          <div class="stat-card__label">Volunteer Hours</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--recycle">
+          <i class="fas fa-recycle"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="stat-recycling">—</div>
+          <div class="stat-card__label">Recycling Drives</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Error state -->
+    <div class="stats-error" id="stats-error" style="display:none; text-align: center; padding: 20px; background: #FFEBEE; border: 1px solid #FFCDD2; border-radius: 12px; color: #C62828; font-weight: 600;">
+      <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 8px;"></i><br>
+      <span>Unable to load live scholarship data.</span>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HOW THE GREEN SCHOLARSHIP WORKS (4 STEPS)
+═══════════════════════════════════════════════════ -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <div class="section-header" style="margin-bottom: 2.5rem; text-align: center;">
+      <h2 class="section-title">How the Green Scholarship Works</h2>
+      <div class="section-divider">
+        <span></span><i class="fas fa-leaf"></i><span></span>
+      </div>
+      <p class="section-subtitle">Four simple steps to turn your environmental contributions into academic funding.</p>
+    </div>
+    
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step__number">01</div>
+        <div class="step__icon"><i class="fas fa-file-signature"></i></div>
+        <h4 class="step__title">1. Apply</h4>
+        <p class="step__desc">Fill out the official Green Scholarship application with your academic details.</p>
+      </div>
+
+      <div class="step__connector"><i class="fas fa-chevron-right"></i></div>
+
+      <div class="step">
+        <div class="step__number">02</div>
+        <div class="step__icon"><i class="fas fa-tree"></i></div>
+        <h4 class="step__title">2. Submit Environmental Activities</h4>
+        <p class="step__desc">Log verified contributions like tree plantation, recycling, and volunteer hours.</p>
+      </div>
+
+      <div class="step__connector"><i class="fas fa-chevron-right"></i></div>
+
+      <div class="step">
+        <div class="step__number">03</div>
+        <div class="step__icon"><i class="fas fa-check-shield"></i></div>
+        <h4 class="step__title">3. Evaluate Eligibility</h4>
+        <p class="step__desc">Automated Snowflake eligibility calculation based on Green Score & GPA.</p>
+      </div>
+
+      <div class="step__connector"><i class="fas fa-chevron-right"></i></div>
+
+      <div class="step">
+        <div class="step__number">04</div>
+        <div class="step__icon"><i class="fas fa-chart-pie"></i></div>
+        <h4 class="step__title">4. Analyze Impact</h4>
+        <p class="step__desc">Track cumulative environmental sustainability metrics across Karnataka colleges.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     ENVIRONMENTAL IMPACT SECTION (LIVE METRICS)
+═══════════════════════════════════════════════════ -->
+<section class="explore-section" id="environmental-impact-section" style="background: #F4F8F4; padding: 60px 0;">
+  <div class="container">
+    <div class="section-header" style="margin-bottom: 2.5rem; text-align: center;">
+      <h2 class="section-title"><i class="fas fa-leaf" style="color: #1B7F3A;"></i> Cumulative Environmental Impact</h2>
+      <p class="section-subtitle">Real-time environmental contributions registered in our live Snowflake database.</p>
+    </div>
+
+    <div class="stats-grid" id="env-impact-grid">
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--trees">
+          <i class="fas fa-tree"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-trees">—</div>
+          <div class="stat-card__label">Trees Planted</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--hours">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-volunteer">—</div>
+          <div class="stat-card__label">Volunteer Hours</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--recycle">
+          <i class="fas fa-recycle"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-recycling">—</div>
+          <div class="stat-card__label">Recycling Drives</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #E0F7FA; color: #00ACC1;">
+          <i class="fas fa-hand-holding-droplet"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-water">—</div>
+          <div class="stat-card__label">Water Conservation</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #F3E5F5; color: #8E24AA;">
+          <i class="fas fa-broom"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-campus">—</div>
+          <div class="stat-card__label">Campus Cleaning</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #FFFDE7; color: #F57F17;">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="stat-card__body">
+          <div class="stat-card__value" id="env-energy">—</div>
+          <div class="stat-card__label">Energy Campaigns</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CALL TO ACTION BANNER
+═══════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container cta-section__inner">
+    <div class="cta-section__text">
+      <h2 class="cta-section__title">Ready to Make an Impact?</h2>
+      <p class="cta-section__subtitle">
+        Join thousands of students who are making the planet greener while earning scholarships.
+      </p>
+    </div>
+    <div class="cta-section__actions">
+      <a href="/apply" class="btn btn--cta-primary">
+        <i class="fas fa-file-signature"></i> Apply Now
+      </a>
+      <a href="/eligibility" class="btn btn--cta-outline">
+        <i class="fas fa-search"></i> Check Eligibility
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+{% endblock %}

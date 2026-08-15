@@ -1,0 +1,730 @@
+{% extends "base.html" %}
+
+{% block title %}Green Scholarship Application{% endblock %}
+{% block description %}Submit your academic background and environmental activity contributions to apply for funding.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}" />
+<style>
+  .app-container {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  
+  .form-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 1px solid #EAF6E8;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 32px;
+    margin-bottom: 30px;
+  }
+  
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #006B3C;
+    border-bottom: 2px solid #EAF6E8;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+
+  /* 2-Column Responsive Grid */
+  .grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+  }
+
+  @media (max-width: 768px) {
+    .grid-2col {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group-custom.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-group-custom label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #173B2A;
+  }
+
+  .form-group-custom label span.req {
+    color: #D32F2F;
+  }
+
+  .input-custom, .select-custom {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #D0E4D0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    background: #FFFFFF;
+    color: #173B2A;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .input-custom:focus, .select-custom:focus {
+    border-color: #006B3C;
+    box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.12);
+  }
+
+  .input-hint {
+    font-size: 0.74rem;
+    color: #5A7A6A;
+  }
+
+  /* Environmental Cards Grid */
+  .env-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .env-input-card {
+    background: #F9FAF9;
+    border: 1px solid #E0EBE0;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .env-input-card:hover {
+    background: #FFFFFF;
+    border-color: #A5D6A7;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  .env-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #173B2A;
+  }
+
+  /* Green Score Card */
+  .score-preview-box {
+    background: linear-gradient(135deg, #006B3C, #2E7D32);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 24px;
+    box-shadow: 0 6px 18px rgba(0, 107, 60, 0.2);
+  }
+
+  .score-number {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 8px 0 4px 0;
+  }
+
+  /* Document Upload Cards */
+  .doc-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .doc-card {
+    border: 1.5px dashed #B2DFDB;
+    background: #FAFAFA;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .doc-card:hover {
+    border-color: #006B3C;
+    background: #E8F5E9;
+  }
+
+  .doc-card label {
+    display: block;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #006B3C;
+    margin-top: 8px;
+  }
+
+  .doc-filename {
+    font-size: 0.76rem;
+    color: #2E7D32;
+    margin-top: 6px;
+    word-break: break-all;
+    font-weight: 600;
+  }
+
+  /* Application Summary Card */
+  .summary-card {
+    background: #EAF6E8;
+    border: 1px solid #C8E6C9;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 28px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px 16px;
+    margin-top: 12px;
+  }
+
+  .summary-item span:first-child {
+    display: block;
+    font-size: 0.72rem;
+    color: #5A7A6A;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .summary-item span:last-child {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #173B2A;
+  }
+
+  /* Success Card */
+  .success-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 2px solid #2E7D32;
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.15);
+    padding: 40px;
+    text-align: center;
+    animation: fadeInSlide 0.3s ease;
+  }
+
+  .success-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #E8F5E9;
+    color: #2E7D32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 20px auto;
+  }
+
+  .app-id-badge {
+    display: inline-block;
+    background: #173B2A;
+    color: #FFFFFF;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    margin: 12px 0 20px 0;
+  }
+
+  .field-error {
+    color: #D32F2F;
+    font-size: 0.74rem;
+    font-weight: 600;
+    display: none;
+    margin-top: 2px;
+  }
+
+  .has-error .input-custom, .has-error .select-custom {
+    border-color: #D32F2F !important;
+    background: #FFEBEE !important;
+  }
+</style>
+{% endblock %}
+
+{% block nav_apply %}active{% endblock %}
+{% block mnav_apply %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title"><i class="fas fa-file-signature"></i> Green Scholarship Application</h1>
+    <p class="page-subtitle">Submit your academic background and environmental activity contributions to apply for funding.</p>
+  </div>
+</div>
+
+<div class="container app-container">
+  <!-- SUCCESS STATE CARD (Hidden by default) -->
+  <div id="application-success-card" class="success-card" style="display: none;">
+    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+    <h2 style="color: #006B3C; font-size: 1.6rem; font-weight: 800;">✓ Application Submitted Successfully</h2>
+    <p style="color: #5A7A6A; font-size: 1rem; margin-top: 6px;">Your Green Scholarship application has been submitted to the official database.</p>
+    
+    <div>
+      <span style="font-size: 0.85rem; color: #5A7A6A;">Application ID</span><br>
+      <div class="app-id-badge" id="success-app-id">GS-2026-000000</div>
+    </div>
+
+    <p style="font-size: 0.9rem; color: #173B2A; font-weight: 600;">Status: <span style="color: #2E7D32;">Submitted</span></p>
+
+    <div style="display: flex; justify-content: center; gap: 16px; margin-top: 28px; flex-wrap: wrap;">
+      <a href="{{ url_for('eligibility_page') }}" class="btn btn--hero-primary"><i class="fas fa-award"></i> View Eligibility</a>
+      <a href="{{ url_for('home_page') }}" class="btn btn--hero-outline"><i class="fas fa-house"></i> Back to Home</a>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION FORM -->
+  <form id="scholarship-application-form" class="form-card" novalidate>
+    <div id="form-global-error" class="auth-alert error" style="display: none; margin-bottom: 20px;"></div>
+
+    <!-- 1. STUDENT INFORMATION -->
+    <div class="section-head">
+      <i class="fas fa-id-card"></i> 1. Student Information
+    </div>
+
+    <div class="grid-2col">
+      <div class="form-group-custom" id="fg-student-id">
+        <label for="app-student-id">Student ID <span class="req">*</span></label>
+        <input type="text" id="app-student-id" class="input-custom" placeholder="Enter Student ID (e.g. GS100001)" value="GS100001" required />
+        <span class="field-error" id="err-student-id">Please enter your Student ID.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-student-name">
+        <label for="app-student-name">Full Name <span class="req">*</span></label>
+        <input type="text" id="app-student-name" class="input-custom" placeholder="Enter Full Name" required />
+        <span class="field-error" id="err-student-name">Please enter your full name.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-email">
+        <label for="app-email">Email Address <span class="req">*</span></label>
+        <input type="email" id="app-email" class="input-custom" placeholder="student@example.com" required />
+        <span class="field-error" id="err-email">Please enter a valid email address.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-college">
+        <label for="app-college">College / University <span class="req">*</span></label>
+        <input type="text" id="app-college" class="input-custom" placeholder="Enter institution name" required />
+        <span class="field-error" id="err-college">Please enter your college name.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-course">
+        <label for="app-course">Course <span class="req">*</span></label>
+        <select id="app-course" class="select-custom" required>
+          <option value="">Select Course</option>
+          <option value="BCA">BCA (Bachelor of Computer Applications)</option>
+          <option value="BCom">BCom (Bachelor of Commerce)</option>
+          <option value="BA">BA (Bachelor of Arts)</option>
+          <option value="BSc">BSc (Bachelor of Science)</option>
+          <option value="BBA">BBA (Bachelor of Business Administration)</option>
+          <option value="BE Computer Science">BE Computer Science</option>
+          <option value="BE Information Science">BE Information Science</option>
+          <option value="BE Electronics">BE Electronics</option>
+          <option value="BE Civil">BE Civil</option>
+          <option value="BE Mechanical">BE Mechanical</option>
+        </select>
+        <span class="field-error" id="err-course">Please select your course.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-district">
+        <label for="app-district">District <span class="req">*</span></label>
+        <select id="app-district" class="select-custom" required>
+          <option value="">Select District</option>
+          <option value="Bengaluru Urban">Bengaluru Urban</option>
+          <option value="Bengaluru Rural">Bengaluru Rural</option>
+          <option value="Mysuru">Mysuru</option>
+          <option value="Mangaluru">Mangaluru</option>
+          <option value="Udupi">Udupi</option>
+          <option value="Dakshina Kannada">Dakshina Kannada</option>
+          <option value="Dharwad">Dharwad</option>
+          <option value="Belagavi">Belagavi</option>
+          <option value="Shivamogga">Shivamogga</option>
+          <option value="Vijayapura">Vijayapura</option>
+          <option value="Tumakuru">Tumakuru</option>
+          <option value="Hassan">Hassan</option>
+          <option value="Kalaburagi">Kalaburagi</option>
+        </select>
+        <span class="field-error" id="err-district">Please select your district.</span>
+      </div>
+
+      <div class="form-group-custom" id="fg-gender">
+        <label for="app-gender">Gender</label>
+        <select id="app-gender" class="select-custom">
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group-custom" id="fg-year">
+        <label for="app-year">Academic Year <span class="req">*</span></label>
+        <select id="app-year" class="select-custom" required>
+          <option value="">Select Year</option>
+          <option value="1">Year 1 (Freshman)</option>
+          <option value="2">Year 2 (Sophomore)</option>
+          <option value="3">Year 3 (Junior)</option>
+          <option value="4">Year 4 (Senior)</option>
+        </select>
+        <span class="field-error" id="err-year">Please select your academic year.</span>
+      </div>
+
+      <div class="form-group-custom full-width" id="fg-scholarship">
+        <label for="app-scholarship">Scholarship Type</label>
+        <select id="app-scholarship" class="select-custom">
+          <option value="Eco Excellence">Eco Excellence Scholarship</option>
+          <option value="Green Merit">Green Merit Scholarship</option>
+          <option value="Need Based">Need Based Scholarship</option>
+          <option value="Rural Support">Rural Support Scholarship</option>
+          <option value="Sports">Sports & Green Leadership</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. ENVIRONMENTAL ACTIVITIES & IMPACT -->
+    <div class="section-head">
+      <i class="fas fa-leaf"></i> 2. Environmental Activities & Impact
+    </div>
+
+    <div class="env-cards-grid">
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-tree" style="color: #2E7D32;"></i> Trees Planted</div>
+        <input type="number" id="env-trees" class="input-custom live-calc" min="0" value="10" placeholder="0" />
+        <span class="input-hint">Number of trees planted</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-clock" style="color: #0288D1;"></i> Volunteer Hours</div>
+        <input type="number" id="env-hours" class="input-custom live-calc" min="0" value="25" placeholder="0" />
+        <span class="input-hint">Total volunteer hours</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-recycle" style="color: #ED6C02;"></i> Recycling Drives</div>
+        <input type="number" id="env-drives" class="input-custom live-calc" min="0" value="3" placeholder="0" />
+        <span class="input-hint">Drives organized/attended</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-hand-holding-droplet" style="color: #00ACC1;"></i> Water Conservation</div>
+        <input type="number" id="env-water" class="input-custom live-calc" min="0" value="2" placeholder="0" />
+        <span class="input-hint">Activities conducted</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-broom" style="color: #8E24AA;"></i> Campus Cleaning</div>
+        <input type="number" id="env-campus" class="input-custom live-calc" min="0" value="4" placeholder="0" />
+        <span class="input-hint">Campus drives completed</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-bolt" style="color: #F57F17;"></i> Energy Campaigns</div>
+        <input type="number" id="env-energy" class="input-custom live-calc" min="0" value="2" placeholder="0" />
+        <span class="input-hint">Saving campaigns led</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-people-carry-box" style="color: #43A047;"></i> Community Services</div>
+        <input type="number" id="env-community" class="input-custom live-calc" min="0" value="5" placeholder="0" />
+        <span class="input-hint">Community events</span>
+      </div>
+
+      <div class="env-input-card">
+        <div class="env-card-header"><i class="fas fa-award" style="color: #D81B60;"></i> NSS / NCC Activities</div>
+        <select id="env-nss-ncc" class="select-custom live-calc">
+          <option value="false">No Participation</option>
+          <option value="true">Active Member</option>
+        </select>
+        <span class="input-hint">Participation status</span>
+      </div>
+    </div>
+
+    <!-- 4. GREEN SCORE PREVIEW -->
+    <div class="score-preview-box">
+      <div style="font-size: 1rem; font-weight: 700; opacity: 0.9;"><i class="fas fa-seedling"></i> Environmental Impact Score</div>
+      <div class="score-number" id="preview-green-score">222.5</div>
+      <div style="font-size: 0.85rem; opacity: 0.9;">Green Score Preview</div>
+    </div>
+
+    <!-- 3. ACADEMIC PERFORMANCE -->
+    <div class="section-head">
+      <i class="fas fa-graduation-cap"></i> 3. Academic Performance
+    </div>
+
+    <div class="grid-2col">
+      <div class="form-group-custom full-width" id="fg-academic">
+        <label for="app-percentage">Academic Percentage / GPA <span class="req">*</span></label>
+        <input type="number" id="app-percentage" class="input-custom live-calc" step="0.01" min="0" max="100" placeholder="Enter percentage (e.g. 85.5) or GPA (e.g. 8.5)" value="85" required />
+        <span class="input-hint">Specify percentage (0–100%) or GPA (0–10.0 scale, automatically converted to percentage equivalent).</span>
+        <span class="field-error" id="err-academic">Please enter a valid academic percentage or GPA.</span>
+      </div>
+    </div>
+
+    <!-- 5. SUPPORTING DOCUMENTS -->
+    <div class="section-head">
+      <i class="fas fa-file-pdf"></i> 4. Supporting Documents
+    </div>
+
+    <div class="doc-upload-grid">
+      <div class="doc-card">
+        <i class="fas fa-file-invoice" style="font-size: 1.8rem; color: #006B3C;"></i>
+        <label for="doc-academic">Academic Certificate</label>
+        <input type="file" id="doc-academic" style="display: none;" onchange="updateDocName(this, 'doc-academic-name')" accept=".pdf,.png,.jpg,.jpeg" />
+        <div class="doc-filename" id="doc-academic-name">No file chosen</div>
+      </div>
+
+      <div class="doc-card">
+        <i class="fas fa-address-card" style="font-size: 1.8rem; color: #0288D1;"></i>
+        <label for="doc-id">Identity Proof</label>
+        <input type="file" id="doc-id" style="display: none;" onchange="updateDocName(this, 'doc-id-name')" accept=".pdf,.png,.jpg,.jpeg" />
+        <div class="doc-filename" id="doc-id-name">No file chosen</div>
+      </div>
+
+      <div class="doc-card">
+        <i class="fas fa-award" style="font-size: 1.8rem; color: #ED6C02;"></i>
+        <label for="doc-activity">Environmental Certificate</label>
+        <input type="file" id="doc-activity" style="display: none;" onchange="updateDocName(this, 'doc-activity-name')" accept=".pdf,.png,.jpg,.jpeg" />
+        <div class="doc-filename" id="doc-activity-name">No file chosen</div>
+      </div>
+
+      <div class="doc-card">
+        <i class="fas fa-certificate" style="font-size: 1.8rem; color: #8E24AA;"></i>
+        <label for="doc-nss">NSS / NCC Certificate</label>
+        <input type="file" id="doc-nss" style="display: none;" onchange="updateDocName(this, 'doc-nss-name')" accept=".pdf,.png,.jpg,.jpeg" />
+        <div class="doc-filename" id="doc-nss-name">No file chosen</div>
+      </div>
+    </div>
+
+    <!-- 6. APPLICATION SUMMARY CARD -->
+    <div class="summary-card">
+      <div style="font-size: 0.95rem; font-weight: 700; color: #006B3C; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-list-check"></i> Application Summary Preview
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span>Student Name</span>
+          <span id="sum-name">Not entered</span>
+        </div>
+        <div class="summary-item">
+          <span>College</span>
+          <span id="sum-college">Not entered</span>
+        </div>
+        <div class="summary-item">
+          <span>Course</span>
+          <span id="sum-course">Not selected</span>
+        </div>
+        <div class="summary-item">
+          <span>Academic % / GPA</span>
+          <span id="sum-academic">85%</span>
+        </div>
+        <div class="summary-item">
+          <span>Trees Planted</span>
+          <span id="sum-trees">10</span>
+        </div>
+        <div class="summary-item">
+          <span>Volunteer Hours</span>
+          <span id="sum-hours">25 hrs</span>
+        </div>
+        <div class="summary-item">
+          <span>Recycling Drives</span>
+          <span id="sum-drives">3</span>
+        </div>
+        <div class="summary-item">
+          <span>Green Score</span>
+          <span id="sum-score" style="color: #006B3C;">222.5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SUBMIT BUTTON -->
+    <div style="margin-top: 32px;">
+      <button type="submit" class="btn btn--hero-primary btn--full" id="btn-submit-application" style="padding: 16px; font-size: 1.05rem;">
+        <i class="fas fa-paper-plane"></i> 🌱 Submit Scholarship Application
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// File upload name display
+function updateDocName(input, targetId) {
+  const file = input.files[0];
+  const target = document.getElementById(targetId);
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB limit.');
+      input.value = '';
+      target.textContent = 'No file chosen';
+      return;
+    }
+    target.textContent = `✓ ${file.name}`;
+  } else {
+    target.textContent = 'No file chosen';
+  }
+}
+
+// Live Green Score Calculation & Summary Sync
+function calculateLiveScore() {
+  const trees = parseFloat(document.getElementById('env-trees').value) || 0;
+  const hours = parseFloat(document.getElementById('env-hours').value) || 0;
+  const drives = parseFloat(document.getElementById('env-drives').value) || 0;
+  const water = parseFloat(document.getElementById('env-water').value) || 0;
+  const campus = parseFloat(document.getElementById('env-campus').value) || 0;
+  const energy = parseFloat(document.getElementById('env-energy').value) || 0;
+  
+  let academicInput = parseFloat(document.getElementById('app-percentage').value) || 0;
+  // If user enters GPA (0-10 scale), convert to percentage
+  let percentageVal = academicInput;
+  if (academicInput > 0 && academicInput <= 10.0) {
+    percentageVal = academicInput * 9.5;
+  }
+
+  const score = (trees * 3) + (hours * 1.5) + (drives * 5) + (water * 4) + (campus * 4) + (energy * 3) + (percentageVal * 2);
+  const roundedScore = Math.round(score * 10) / 10;
+
+  // Update preview boxes
+  document.getElementById('preview-green-score').textContent = roundedScore;
+  document.getElementById('sum-score').textContent = roundedScore;
+
+  // Sync summary items
+  document.getElementById('sum-name').textContent = document.getElementById('app-student-name').value || 'Not entered';
+  document.getElementById('sum-college').textContent = document.getElementById('app-college').value || 'Not entered';
+  document.getElementById('sum-course').textContent = document.getElementById('app-course').value || 'Not selected';
+  document.getElementById('sum-academic').textContent = academicInput ? `${academicInput}${academicInput <= 10 ? ' GPA' : '%'}` : 'Not entered';
+  document.getElementById('sum-trees').textContent = trees;
+  document.getElementById('sum-hours').textContent = `${hours} hrs`;
+  document.getElementById('sum-drives').textContent = drives;
+}
+
+// Attach live inputs listeners
+document.querySelectorAll('.live-calc, #app-student-name, #app-college, #app-course').forEach(input => {
+  input.addEventListener('input', calculateLiveScore);
+  input.addEventListener('change', calculateLiveScore);
+});
+
+// Form Submission Handler
+document.getElementById('scholarship-application-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formCard = document.getElementById('scholarship-application-form');
+  const globalError = document.getElementById('form-global-error');
+  const btn = document.getElementById('btn-submit-application');
+  
+  // Clear previous errors
+  document.querySelectorAll('.form-group-custom').forEach(el => el.classList.remove('has-error'));
+  document.querySelectorAll('.field-error').forEach(el => el.style.display = 'none');
+  globalError.style.display = 'none';
+
+  let isValid = true;
+  
+  function setError(groupId, errId) {
+    document.getElementById(groupId)?.classList.add('has-error');
+    const errEl = document.getElementById(errId);
+    if (errEl) errEl.style.display = 'block';
+    isValid = false;
+  }
+
+  // Validate fields
+  const studentId = document.getElementById('app-student-id').value.trim();
+  const studentName = document.getElementById('app-student-name').value.trim();
+  const email = document.getElementById('app-email').value.trim();
+  const college = document.getElementById('app-college').value.trim();
+  const course = document.getElementById('app-course').value;
+  const district = document.getElementById('app-district').value;
+  const year = document.getElementById('app-year').value;
+  const academicVal = parseFloat(document.getElementById('app-percentage').value);
+
+  if (!studentId) setError('fg-student-id', 'err-student-id');
+  if (!studentName) setError('fg-student-name', 'err-student-name');
+  if (!email || !email.includes('@')) setError('fg-email', 'err-email');
+  if (!college) setError('fg-college', 'err-college');
+  if (!course) setError('fg-course', 'err-course');
+  if (!district) setError('fg-district', 'err-district');
+  if (!year) setError('fg-year', 'err-year');
+  if (isNaN(academicVal) || academicVal < 0 || academicVal > 100) setError('fg-academic', 'err-academic');
+
+  if (!isValid) {
+    globalError.style.display = 'block';
+    globalError.textContent = '⚠ Please fill in all required fields correctly before submitting.';
+    window.scrollTo({ top: 100, behavior: 'smooth' });
+    return;
+  }
+
+  // Disable button & show loading state
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Submitting Application...';
+
+  // Compute final percentage
+  let finalPercentage = academicVal;
+  if (academicVal <= 10.0) finalPercentage = academicVal * 9.5;
+
+  const payload = {
+    student_id: studentId,
+    student_name: studentName,
+    email: email,
+    college: college,
+    course: course,
+    district: district,
+    gender: document.getElementById('app-gender').value,
+    year: year,
+    scholarship_type: document.getElementById('app-scholarship').value,
+    trees_planted: parseInt(document.getElementById('env-trees').value) || 0,
+    volunteer_hours: parseInt(document.getElementById('env-hours').value) || 0,
+    recycling_drives: parseInt(document.getElementById('env-drives').value) || 0,
+    water_conservation: parseInt(document.getElementById('env-water').value) || 0,
+    campus_cleaning: parseInt(document.getElementById('env-campus').value) || 0,
+    energy_campaigns: parseInt(document.getElementById('env-energy').value) || 0,
+    community_services: parseInt(document.getElementById('env-community').value) || 0,
+    nss_ncc: document.getElementById('env-nss-ncc').value === 'true',
+    percentage: finalPercentage
+  };
+
+  try {
+    const res = await fetch('/api/applications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Application Submission Failed');
+    }
+
+    // Success response
+    formCard.style.display = 'none';
+    const successCard = document.getElementById('application-success-card');
+    document.getElementById('success-app-id').textContent = data.application_id || `GS-${studentId}`;
+    successCard.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> 🌱 Submit Scholarship Application';
+    globalError.style.display = 'block';
+    globalError.textContent = '⚠ Application Submission Failed. Unable to submit your application at this time. Please try again.';
+    console.error('Submission error:', err);
+  }
+});
+
+// Calculate initial score on page load
+document.addEventListener('DOMContentLoaded', calculateLiveScore);
+</script>
+{% endblock %}

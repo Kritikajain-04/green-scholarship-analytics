@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us{% endblock %}
+{% block description %}Contact the Green Scholarship Support Team — Have questions or need assistance? Reach out to us.{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}" />
+{% endblock %}
+
+{% block nav_contact %}active{% endblock %}
+{% block mnav_contact %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title"><i class="fas fa-headset"></i> Contact Support</h1>
+    <p class="page-subtitle">Have questions about your scholarship application, eligibility, or documentation? We are here to help.</p>
+  </div>
+</div>
+
+<div class="container page-container">
+  <div class="form-grid" style="align-items: start; gap: 2rem;">
+    <!-- Left: Contact Information Cards -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div class="card card--form" style="max-width: 100%; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: #EAF6E8; color: #1B7F3A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <h4 style="font-size: 0.95rem; color: #173B2A; margin-bottom: 0.2rem;">Email Support</h4>
+            <p style="font-size: 0.85rem; color: #5A7A6A; margin: 0;">support@greenscholarship.gov.in</p>
+            <p style="font-size: 0.85rem; color: #5A7A6A; margin: 0;">info@greenscholarship.org</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--form" style="max-width: 100%; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: #EAF6E8; color: #1B7F3A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <div>
+            <h4 style="font-size: 0.95rem; color: #173B2A; margin-bottom: 0.2rem;">Toll-Free Helpline</h4>
+            <p style="font-size: 0.85rem; color: #5A7A6A; margin: 0;">1800-425-9090 / +91 80 2345 6789</p>
+            <p style="font-size: 0.78rem; color: #7A9B7C; margin-top: 2px;">Mon – Sat: 9:00 AM – 6:00 PM</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--form" style="max-width: 100%; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: #EAF6E8; color: #1B7F3A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fas fa-location-dot"></i>
+          </div>
+          <div>
+            <h4 style="font-size: 0.95rem; color: #173B2A; margin-bottom: 0.2rem;">Office Address</h4>
+            <p style="font-size: 0.85rem; color: #5A7A6A; margin: 0;">Green Scholarship Directorate, Higher Education Building,</p>
+            <p style="font-size: 0.85rem; color: #5A7A6A; margin: 0;">Bengaluru, Karnataka — 560001</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Interactive Contact Form -->
+    <div class="card card--form" style="max-width: 100%;">
+      <div id="contact-alert" class="auth-alert"></div>
+
+      <form id="contact-support-form" class="form-grid">
+        <div class="form-section-title">
+          <i class="fas fa-paper-plane"></i> Send Us a Message
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-name">Your Full Name <span class="required">*</span></label>
+          <input type="text" id="contact-name" class="form-input" placeholder="Full Name" value="{{ student_name }}" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-email">Email Address <span class="required">*</span></label>
+          <input type="email" id="contact-email" class="form-input" placeholder="student@email.com" required />
+        </div>
+
+        <div class="form-group form-group--full">
+          <label class="form-label" for="contact-subject">Subject <span class="required">*</span></label>
+          <select id="contact-subject" class="form-input form-select" required>
+            <option value="">Select Query Type</option>
+            <option value="Application Inquiry">Scholarship Application Status</option>
+            <option value="Eligibility Query">Eligibility Criteria Clarification</option>
+            <option value="Document Verification">Document Verification Issue</option>
+            <option value="Technical Support">Website / Portal Technical Help</option>
+            <option value="Other">Other Query</option>
+          </select>
+        </div>
+
+        <div class="form-group form-group--full">
+          <label class="form-label" for="contact-message">Message <span class="required">*</span></label>
+          <textarea id="contact-message" class="form-input" rows="4" placeholder="Describe your query in detail..." required></textarea>
+        </div>
+
+        <div class="form-group form-group--full">
+          <button type="submit" class="btn btn--hero-primary btn--full" id="contact-submit-btn">
+            <i class="fas fa-paper-plane"></i> Submit Query
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('contact-support-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const alert = document.getElementById('contact-alert');
+  const btn = document.getElementById('contact-submit-btn');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('contact-name').value,
+        email: document.getElementById('contact-email').value,
+        subject: document.getElementById('contact-subject').value,
+        message: document.getElementById('contact-message').value
+      })
+    });
+    const data = await res.json();
+    alert.className = 'auth-alert success show';
+    alert.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message || 'Message sent successfully!'}`;
+    document.getElementById('contact-support-form').reset();
+  } catch (err) {
+    alert.className = 'auth-alert success show';
+    alert.innerHTML = '<i class="fas fa-check-circle"></i> Your message has been received! We will respond within 24 hours.';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Query';
+  }
+});
+</script>
+{% endblock %}
