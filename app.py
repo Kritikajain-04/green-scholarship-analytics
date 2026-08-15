@@ -346,6 +346,15 @@ def api_student_eligibility(student_id):
                 "message": f"Student ID '{student_id}' was not found in the official Green Scholarship dataset."
             }), 404
 
+        percentage_val = float(r[15] or 0)
+        green_score_val = float(r[14] or 0)
+        family_income_val = float(r[17]) if r[17] is not None else 0.0
+        
+        # Calculate dynamic eligibility based on actual criteria:
+        # Percentage >= 75 AND GreenScore >= 300 AND FamilyIncome <= 80000
+        is_eligible = (percentage_val >= 75.0) and (green_score_val >= 300.0) and (family_income_val <= 80000.0)
+        computed_eligibility = "Eligible" if is_eligible else "Not Eligible"
+
         student_data = {
             "student_id": r[0],
             "student_name": r[1],
@@ -361,10 +370,10 @@ def api_student_eligibility(student_id):
             "water_conservation": int(r[11] or 0),
             "campus_cleaning": int(r[12] or 0),
             "energy_campaigns": int(r[13] or 0),
-            "green_score": float(r[14] or 0),
-            "percentage": float(r[15] or 0),
-            "eligibility": r[16],
-            "family_income": float(r[17]) if r[17] is not None else None,
+            "green_score": green_score_val,
+            "percentage": percentage_val,
+            "eligibility": computed_eligibility,
+            "family_income": family_income_val,
             "green_activities": int(r[18] or 0),
             "nss_ncc": bool(r[19]),
             "nss_ncc_hours": int(r[20] or 0)
@@ -379,9 +388,9 @@ def api_student_eligibility(student_id):
             "college": r[2],
             "course": r[3],
             "district": r[4],
-            "green_score": float(r[14] or 0),
-            "percentage": float(r[15] or 0),
-            "eligibility": r[16],
+            "green_score": green_score_val,
+            "percentage": percentage_val,
+            "eligibility": computed_eligibility,
             "scholarship_type": r[7],
             "trees_planted": int(r[8] or 0),
             "volunteer_hours": int(r[9] or 0),
@@ -419,8 +428,11 @@ def api_submit_application():
         energy = int(data.get("energy_campaigns", 0) or 0)
         
         percentage = float(data.get("percentage", 0) or 0)
+        family_income = float(data.get("family_income", 0) or 0)
         green_score = round((trees * 3) + (vol_hours * 1.5) + (recycling * 5) + (water * 4) + (campus * 4) + (energy * 3) + (percentage * 2), 2)
-        eligibility = "Eligible" if (green_score >= 150 and percentage >= 60.0) else "Not Eligible"
+        
+        # Alteryx logic: Percentage >= 75 AND GreenScore >= 300 AND FamilyIncome <= 80000
+        eligibility = "Eligible" if (percentage >= 75.0 and green_score >= 300.0 and family_income <= 80000.0) else "Not Eligible"
         
         conn = get_snowflake_connection()
         cur = conn.cursor()
@@ -431,11 +443,11 @@ def api_submit_application():
             INSERT INTO GREENSCHOLARSHIP_DATA 
             (STUDENTID, STUDENTNAME, EMAIL, COLLEGE, COURSE, DISTRICT, GENDER, YEAR, SCHOLARSHIPTYPE, 
              TREESPLANTED, VOLUNTEERHOURS, RECYCLINGDRIVES, WATERCONSERVATIONACTIVITIES, CAMPUSCLEANINGDRIVES, 
-             ENERGYSAVINGCAMPAIGNS, GREENSCORE, PERCENTAGE, ELIGIBILITY, APPLICATIONDATE, STATUS)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE(), 'Submitted')
+             ENERGYSAVINGCAMPAIGNS, GREENSCORE, PERCENTAGE, ELIGIBILITY, APPLICATIONDATE, STATUS, FAMILYINCOME)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE(), 'Submitted', %s)
         """
         cur.execute(sql, (student_id, student_name, email, college, course, district, gender, year, scholarship_type,
-                          trees, vol_hours, recycling, water, campus, energy, green_score, percentage, eligibility))
+                          trees, vol_hours, recycling, water, campus, energy, green_score, percentage, eligibility, family_income))
         conn.commit()
 
         # Invalidate dashboard caches on new record insertion
@@ -895,6 +907,16 @@ def api_students():
                     record[col_name] = val
                 else:
                     record[col_name] = str(val)
+            
+            # Calculate dynamic eligibility based on actual criteria:
+            # Percentage >= 75 AND GreenScore >= 300 AND FamilyIncome <= 80000
+            pct = float(record.get('PERCENTAGE') if record.get('PERCENTAGE') is not None else 0.0)
+            score = float(record.get('GREENSCORE') if record.get('GREENSCORE') is not None else 0.0)
+            income = float(record.get('FAMILYINCOME') if record.get('FAMILYINCOME') is not None else 0.0)
+            if pct >= 75.0 and score >= 300.0 and income <= 80000.0:
+                record['ELIGIBILITY'] = 'Eligible'
+            else:
+                record['ELIGIBILITY'] = 'Not Eligible'
             data.append(record)
 
         return jsonify({

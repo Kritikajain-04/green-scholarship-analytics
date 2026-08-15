@@ -547,6 +547,57 @@
       </div>
     </div>
   </div>
+
+  <!-- CANDIDATE LIST COMPONENT (DYNAMIC TABLE FROM SNOWFLAKE) -->
+  <div class="info-card" style="margin-top: 30px;">
+    <div class="info-card-header" style="justify-content: space-between; display: flex; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <span><i class="fas fa-list-check"></i> Candidate Evaluation List</span>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <select id="tbl-pageSizeSelect" style="padding: 6px 12px; font-size: 0.85rem; width: auto; border: 1.5px solid #CFE2CF; border-radius: 6px;" onchange="changeTblPageSize(this.value)">
+          <option value="25" selected>25 per page</option>
+          <option value="50">50 per page</option>
+        </select>
+        <span class="record-count" id="tbl-recordCount" style="font-size: 0.85rem; font-weight: 600; color: #5A7A6A;">Loading records...</span>
+      </div>
+    </div>
+
+    <!-- Toolbar Filters -->
+    <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; background: #F9FAF9; padding: 14px 18px; border: 1px solid #E0EBE0; border-radius: 10px;">
+      <div style="flex: 2; min-width: 240px; position: relative;">
+        <i class="fas fa-search" style="position: absolute; left: 14px; top: 12px; color: #006B3C;"></i>
+        <input type="text" id="tbl-studentSearch" placeholder="Search ID, Name..." style="width: 100%; padding: 9px 12px 9px 36px; border: 1.5px solid #CFE2CF; border-radius: 6px; outline: none; font-size: 0.9rem;" oninput="debounceTblLoad()" />
+      </div>
+      <div style="flex: 1; min-width: 160px;">
+        <select id="tbl-eligFilter" style="width: 100%; padding: 9px 12px; border: 1.5px solid #CFE2CF; border-radius: 6px; font-size: 0.9rem;" onchange="loadCandidateTable(1)">
+          <option value="">All Eligibility Status</option>
+          <option value="Eligible">Eligible Only</option>
+          <option value="Not Eligible">Not Eligible Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dynamic Candidates Grid Table -->
+    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2EFE2; overflow: hidden;">
+      <div style="overflow-x: auto;">
+        <table id="studentTable" style="width: 100%; border-collapse: collapse; font-size: 0.86rem; text-align: left;">
+          <thead>
+            <tr style="background: linear-gradient(90deg, #006B3C, #2E7D32); color: white;">
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase;">Student ID</th>
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase;">Student Name</th>
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; text-align: right;">Percentage</th>
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; text-align: right;">Green Score</th>
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; text-align: right;">Family Income</th>
+              <th style="padding: 12px 16px; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; text-align: center;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-candidateBody">
+            <tr><td colspan="6" style="text-align: center; padding: 24px;"><i class="fas fa-spinner fa-spin"></i> Loading candidates from Snowflake...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="tbl-tablePagination" style="background: #F9FAF9; border-top: 1px solid #E2EFE2; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 18px; flex-wrap: wrap;"></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -690,5 +741,128 @@ async function checkEligibility() {
 document.getElementById('student-id-input').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') checkEligibility();
 });
+
+// Load candidate list from Snowflake on DOMContentLoaded load
+document.addEventListener('DOMContentLoaded', () => {
+  loadCandidateTable(1);
+});
+
+let currentTblPage = 1;
+let currentTblPageSize = 25;
+let tblDebounceTimeout = null;
+
+function debounceTblLoad() {
+  clearTimeout(tblDebounceTimeout);
+  tblDebounceTimeout = setTimeout(() => {
+    loadCandidateTable(1);
+  }, 350);
+}
+
+function changeTblPageSize(size) {
+  currentTblPageSize = parseInt(size) || 25;
+  loadCandidateTable(1);
+}
+
+async function loadCandidateTable(page = 1) {
+  currentTblPage = page;
+  const tbody = document.getElementById('tbl-candidateBody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching records from Snowflake...</td></tr>`;
+  
+  try {
+    const searchVal = document.getElementById('tbl-studentSearch')?.value || '';
+    const eligVal = document.getElementById('tbl-eligFilter')?.value || '';
+    
+    let url = `/api/students?page=${page}&pageSize=${currentTblPageSize}&search=${encodeURIComponent(searchVal)}`;
+    if (eligVal) {
+      url += `&eligibility=${encodeURIComponent(eligVal)}`;
+    }
+    
+    const response = await fetch(url);
+    const d = await response.json();
+    
+    if (!response.ok || !d.success) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 20px;">Failed to load candidate list.</td></tr>`;
+      return;
+    }
+    
+    const records = d.data || [];
+    const total = d.total_records || d.count || 0;
+    
+    document.getElementById('tbl-recordCount').textContent = 
+      `Showing ${total > 0 ? (page - 1) * currentTblPageSize + 1 : 0}–${Math.min(page * currentTblPageSize, total)} of ${total.toLocaleString()}`;
+      
+    if (records.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: #5A7A6A;">No candidate records found.</td></tr>`;
+      document.getElementById('tbl-tablePagination').innerHTML = '';
+      return;
+    }
+    
+    tbody.innerHTML = records.map(r => {
+      const pct = parseFloat(r.PERCENTAGE) || 0;
+      const score = parseFloat(r.GREENSCORE) || 0;
+      const income = parseFloat(r.FAMILYINCOME) || 0;
+      
+      const calculatedElig = r.ELIGIBILITY || 'Not Eligible';
+      
+      const statusBadge = calculatedElig === 'Eligible' 
+        ? `<span style="background:#C8E6C9; color:#1B5E20; display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:600;">Eligible</span>`
+        : `<span style="background:#FFEBEE; color:#B71C1C; display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:600;">Not Eligible</span>`;
+        
+      return `
+        <tr style="border-bottom: 1px solid #E2EFE2; cursor: pointer; transition: all 0.15s ease;" onclick="selectStudentId('${r.STUDENTID}')" title="Click to view details above">
+          <td style="padding: 10px 16px;"><code>${r.STUDENTID}</code></td>
+          <td style="padding: 10px 16px;"><strong>${r.STUDENTNAME}</strong></td>
+          <td style="padding: 10px 16px; text-align: right;">${pct.toFixed(2)}%</td>
+          <td style="padding: 10px 16px; text-align: right; color:#1B5E20; font-weight:700;">${score}</td>
+          <td style="padding: 10px 16px; text-align: right;">₹${income.toLocaleString('en-IN')}</td>
+          <td style="padding: 10px 16px; text-align: center;">${statusBadge}</td>
+        </tr>
+      `;
+    }).join('');
+    
+    buildTblPagination(total, page, currentTblPageSize);
+    
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center; padding: 20px;">Error connecting to server.</td></tr>`;
+  }
+}
+
+function buildTblPagination(total, page, pageSize) {
+  const pagEl = document.getElementById('tbl-tablePagination');
+  if (!pagEl) return;
+  
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) {
+    pagEl.innerHTML = '';
+    return;
+  }
+  
+  let html = '';
+  html += `<button style="min-width: 32px; height: 32px; border-radius: 6px; border: 1px solid #D7E8D7; background: white; cursor: pointer;" ${page === 1 ? 'disabled' : ''} onclick="loadCandidateTable(${page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+  
+  const start = Math.max(1, page - 2);
+  const end = Math.min(totalPages, page + 2);
+  
+  if (start > 1) {
+    html += `<button style="min-width: 32px; height: 32px; border-radius: 6px; border: 1px solid #D7E8D7; background: white; cursor: pointer;" onclick="loadCandidateTable(1)">1</button>`;
+    if (start > 2) html += `<span style="padding: 0 4px; color: #5A7A6A;">...</span>`;
+  }
+  
+  for (let i = start; i <= end; i++) {
+    const isActive = i === page;
+    html += `<button style="min-width: 32px; height: 32px; border-radius: 6px; border: 1px solid ${isActive ? '#1B5E20' : '#D7E8D7'}; background: ${isActive ? '#1B5E20' : 'white'}; color: ${isActive ? 'white' : '#3A5C3C'}; font-weight: 600; cursor: pointer;" onclick="loadCandidateTable(${i})">${i}</button>`;
+  }
+  
+  if (end < totalPages) {
+    if (end < totalPages - 1) html += `<span style="padding: 0 4px; color: #5A7A6A;">...</span>`;
+    html += `<button style="min-width: 32px; height: 32px; border-radius: 6px; border: 1px solid #D7E8D7; background: white; cursor: pointer;" onclick="loadCandidateTable(${totalPages})">${totalPages}</button>`;
+  }
+  
+  html += `<button style="min-width: 32px; height: 32px; border-radius: 6px; border: 1px solid #D7E8D7; background: white; cursor: pointer;" ${page === totalPages ? 'disabled' : ''} onclick="loadCandidateTable(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+  
+  pagEl.innerHTML = html;
+}
 </script>
 {% endblock %}

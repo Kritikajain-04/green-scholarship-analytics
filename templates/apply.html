@@ -394,6 +394,15 @@
           <option value="Sports">Sports & Green Leadership</option>
         </select>
       </div>
+
+      <div class="form-group-custom full-width" id="fg-family-income">
+        <label for="app-family-income">Family Annual Income <span class="req">*</span></label>
+        <div style="position: relative; display: flex; align-items: center;">
+          <span style="position: absolute; left: 14px; font-weight: bold; color: #173B2A;">₹</span>
+          <input type="number" id="app-family-income" class="input-custom live-calc" min="0" placeholder="Enter annual family income" style="padding-left: 30px;" required />
+        </div>
+        <span class="field-error" id="err-family-income">Please enter a valid, non-negative family annual income.</span>
+      </div>
     </div>
 
     <!-- 2. ENVIRONMENTAL ACTIVITIES & IMPACT -->
@@ -533,6 +542,10 @@
           <span id="sum-academic">85%</span>
         </div>
         <div class="summary-item">
+          <span>Family Income</span>
+          <span id="sum-family-income">₹0</span>
+        </div>
+        <div class="summary-item">
           <span>Trees Planted</span>
           <span id="sum-trees">10</span>
         </div>
@@ -604,6 +617,9 @@ function calculateLiveScore() {
   document.getElementById('sum-score').textContent = roundedScore;
 
   // Sync summary items
+  const familyIncInput = parseFloat(document.getElementById('app-family-income').value) || 0;
+  document.getElementById('sum-family-income').textContent = `₹${familyIncInput.toLocaleString('en-IN')}`;
+
   document.getElementById('sum-name').textContent = document.getElementById('app-student-name').value || 'Not entered';
   document.getElementById('sum-college').textContent = document.getElementById('app-college').value || 'Not entered';
   document.getElementById('sum-course').textContent = document.getElementById('app-course').value || 'Not selected';
@@ -614,7 +630,7 @@ function calculateLiveScore() {
 }
 
 // Attach live inputs listeners
-document.querySelectorAll('.live-calc, #app-student-name, #app-college, #app-course').forEach(input => {
+document.querySelectorAll('.live-calc, #app-student-name, #app-college, #app-course, #app-family-income').forEach(input => {
   input.addEventListener('input', calculateLiveScore);
   input.addEventListener('change', calculateLiveScore);
 });
@@ -650,6 +666,7 @@ document.getElementById('scholarship-application-form')?.addEventListener('submi
   const district = document.getElementById('app-district').value;
   const year = document.getElementById('app-year').value;
   const academicVal = parseFloat(document.getElementById('app-percentage').value);
+  const familyIncomeVal = parseFloat(document.getElementById('app-family-income').value);
 
   if (!studentId) setError('fg-student-id', 'err-student-id');
   if (!studentName) setError('fg-student-name', 'err-student-name');
@@ -659,6 +676,7 @@ document.getElementById('scholarship-application-form')?.addEventListener('submi
   if (!district) setError('fg-district', 'err-district');
   if (!year) setError('fg-year', 'err-year');
   if (isNaN(academicVal) || academicVal < 0 || academicVal > 100) setError('fg-academic', 'err-academic');
+  if (isNaN(familyIncomeVal) || familyIncomeVal < 0) setError('fg-family-income', 'err-family-income');
 
   if (!isValid) {
     globalError.style.display = 'block';
@@ -693,7 +711,8 @@ document.getElementById('scholarship-application-form')?.addEventListener('submi
     energy_campaigns: parseInt(document.getElementById('env-energy').value) || 0,
     community_services: parseInt(document.getElementById('env-community').value) || 0,
     nss_ncc: document.getElementById('env-nss-ncc').value === 'true',
-    percentage: finalPercentage
+    percentage: finalPercentage,
+    family_income: familyIncomeVal
   };
 
   try {
