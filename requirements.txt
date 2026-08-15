@@ -1,19 +1,7 @@
-# ─── Green Scholarship Analytics — Python Dependencies ─────────────────────
-# Production-ready requirements for Render.com / gunicorn deployment
-
-# Web Framework
-flask==3.0.3
+﻿flask==3.0.3
 flask-cors==4.0.1
-
-# Production WSGI Server
 gunicorn==22.0.0
-
-# Snowflake Connector
 snowflake-connector-python==3.14.0
-
-# Environment Variables
 python-dotenv==1.0.1
-
-# PDF Generation (Resources page downloads)
 reportlab==5.0.0
-pillow==11.2.1
+pillow==10.4.0
